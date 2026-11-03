@@ -1,0 +1,291 @@
+/* =========================================================
+   LOGIN
+   Estilos exclusivos de la pantalla de inicio de sesión.
+   ========================================================= */
+
+.login-page {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: 32px 16px;
+    background: var(--color-background);
+}
+
+.login-shell {
+    width: 100%;
+    max-width: 440px;
+}
+
+/* Tarjeta principal */
+.login-card {
+    position: relative;
+    overflow: hidden;
+    padding: 24px 36px 28px;
+    background: var(--color-background);
+    border: 1px solid #eef0f4;
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 24px 60px rgba(1, 1, 1, 0.10),
+        0 2px 8px rgba(1, 1, 1, 0.04);
+}
+
+/* Línea amarilla superior */
+.login-card__accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--color-secondary);
+}
+
+/* Logo institucional */
+.login-card__logo {
+    width: 168px;
+    height: auto;
+    margin: 10px auto 20px;
+    object-fit: contain;
+}
+
+/* Título del sistema */
+.login-card__title {
+    color: var(--color-primary);
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+    letter-spacing: -0.01em;
+}
+
+/* Subtítulo institucional */
+.login-card__subtitle {
+    margin-top: 8px;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* Mensaje de error del login */
+.login-alert {
+    margin-top: 20px;
+    padding: 10px 12px;
+    color: var(--color-danger);
+    background: #fdf2f4;
+    border: 1px solid rgba(193, 32, 55, 0.22);
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+}
+
+/* Formulario */
+.login-form {
+    display: grid;
+    gap: 18px;
+    margin-top: 28px;
+}
+
+.field__label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.field__control {
+    position: relative;
+}
+
+.field__input {
+    width: 100%;
+    height: 50px;
+    padding: 0 14px 0 44px;
+    color: var(--color-text);
+    background: var(--color-background);
+    border: 1px solid var(--color-input-border);
+    border-radius: 10px;
+    outline: none;
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.field__input--password {
+    padding-right: 48px;
+}
+
+.field__input:hover {
+    border-color: #b9bec9;
+}
+
+.field__input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(255, 198, 10, 0.22);
+}
+
+/* Iconos dentro de los campos */
+.field__icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    color: rgba(26, 31, 83, 0.6);
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+/* Botón para mostrar u ocultar la contraseña */
+.password-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: rgba(26, 31, 83, 0.6);
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    transform: translateY(-50%);
+    transition:
+        background-color 160ms ease,
+        color 160ms ease;
+}
+
+.password-toggle:hover {
+    color: var(--color-primary);
+    background: #f3f4f6;
+}
+
+.password-toggle:focus-visible {
+    outline: 2px solid rgba(255, 198, 10, 0.6);
+    outline-offset: 2px;
+}
+
+.password-toggle__icon {
+    width: 20px;
+    height: 20px;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+/* Botón principal */
+.login-button {
+    width: 100%;
+    height: 52px;
+    margin-top: 2px;
+    color: #ffffff;
+    background: var(--color-primary);
+    border: 0;
+    border-radius: 10px;
+    box-shadow: 0 8px 18px rgba(26, 31, 83, 0.18);
+    font-size: 1rem;
+    font-weight: 600;
+    transition:
+        background-color 160ms ease,
+        transform 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.login-button:hover {
+    background: var(--color-primary-hover);
+    box-shadow: 0 10px 22px rgba(26, 31, 83, 0.24);
+    transform: translateY(-1px);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+.login-button:focus-visible {
+    outline: 3px solid rgba(255, 198, 10, 0.55);
+    outline-offset: 2px;
+}
+
+/* Enlace de recuperación */
+.forgot-link {
+    width: fit-content;
+    margin: 0 auto;
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+}
+
+.forgot-link:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+    text-decoration-color: var(--color-secondary);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+.forgot-link:focus-visible {
+    outline: 3px solid rgba(255, 198, 10, 0.55);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+/* Separador y footer del formulario */
+.login-card__divider {
+    height: 1px;
+    margin: 26px 0 16px;
+    background: var(--color-border);
+}
+
+.login-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--color-muted);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.login-card__footer-icon {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+}
+
+/* Nota de seguridad debajo de la tarjeta */
+.security-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 22px auto 0;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.security-note__icon {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+}
+
+/* Respeta la preferencia de reducir animaciones */
+@media (prefers-reduced-motion: reduce) {
+    .field__input,
+    .login-button,
+    .password-toggle {
+        transition: none;
+    }
+
+    .login-button:hover {
+        transform: none;
+    }
+}

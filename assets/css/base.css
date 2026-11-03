@@ -1,0 +1,107 @@
+/* =========================================================
+   BASE DEL SISTEMA
+   Estilos generales, tipografía y variables de color.
+   ========================================================= */
+
+/* Georama 400: texto normal */
+@font-face {
+    font-family: "Georama";
+    src: url("../fonts/Georama-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Georama 500: etiquetas y textos con énfasis medio */
+@font-face {
+    font-family: "Georama";
+    src: url("../fonts/Georama-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Georama 600: títulos y botones */
+@font-face {
+    font-family: "Georama";
+    src: url("../fonts/Georama-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Georama 700: textos de mayor peso */
+@font-face {
+    font-family: "Georama";
+    src: url("../fonts/Georama-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    /* Colores institucionales */
+    --color-primary: #1a1f53;
+    --color-primary-hover: #252b6b;
+    --color-secondary: #ffc60a;
+    --color-background: #ffffff;
+    --color-danger: #c12037;
+    --color-gold-soft: #e8b45d;
+    --color-text: #010101;
+    --color-muted: #6b7280;
+    --color-border: #e5e7eb;
+    --color-input-border: #d8dbe3;
+
+    /* Medidas compartidas */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    color-scheme: light;
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--color-background);
+    color: var(--color-text);
+    font-family: "Georama", sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+}
