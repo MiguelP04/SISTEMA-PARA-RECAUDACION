@@ -1,0 +1,375 @@
+/* =========================================================
+   ESTRUCTURA DEL SISTEMA
+   Encabezado oficial, barra de navegación, menú de usuario
+   y pie de página compartidos por las páginas internas.
+   ========================================================= */
+
+/* Mantiene el pie de página al final de la ventana. */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--color-background);
+}
+
+/* El contenido principal ocupa el espacio disponible. */
+.dashboard-main {
+    flex: 1;
+}
+
+/* =========================================================
+   FRANJA OFICIAL
+   ========================================================= */
+
+/* Fondo blanco y separación fina con la barra azul. */
+.official-bar {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* La imagen institucional se muestra completa y centrada.
+   El ancho máximo permite usar la resolución disponible sin ampliarla. */
+.official-bar__image {
+    display: block;
+    width: 100%;
+    max-width: 2048px;
+    height: auto;
+    margin: 0 auto;
+}
+
+/* =========================================================
+   BARRA PRINCIPAL
+   ========================================================= */
+
+/* Barra azul con la navegación y el bloque de usuario. */
+.main-navbar {
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(1, 1, 1, 0.12);
+}
+
+/* Contenedor alineado con el ancho del contenido. */
+.main-navbar__inner {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    width: min(1320px, calc(100% - 80px));
+    min-height: 76px;
+    margin: 0 auto;
+}
+
+/* Identidad del sistema. */
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* Logo blanco del SENIAT. */
+.brand__logo {
+    width: auto;
+    height: 46px;
+    object-fit: contain;
+}
+
+/* Separador vertical entre el logo y el nombre del sistema. */
+.brand__divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.28);
+}
+
+/* Nombre corto del sistema. */
+.brand__name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+/* Navegación central. */
+.main-navbar__nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 0 auto;
+}
+
+/* Enlace de navegación. */
+.main-navbar__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 76px;
+    padding: 0 14px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.92rem;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 160ms ease;
+}
+
+/* Estado activo: texto blanco y línea amarilla inferior. */
+.main-navbar__link.is-active {
+    color: #ffffff;
+}
+
+.main-navbar__link.is-active::after {
+    position: absolute;
+    right: 14px;
+    bottom: 0;
+    left: 14px;
+    height: 3px;
+    background: var(--color-secondary);
+    content: "";
+}
+
+/* Cambio visual al pasar el mouse. */
+.main-navbar__link:not(.is-disabled):hover {
+    color: #ffffff;
+}
+
+/* Estilos para elementos de navegación deshabilitados. */
+.main-navbar__link.is-disabled {
+    color: rgba(255, 255, 255, 0.58);
+    cursor: default;
+}
+
+/* Anillo de foco para navegación con teclado. */
+.main-navbar__link:focus-visible,
+.brand:focus-visible {
+    outline: 3px solid rgba(255, 198, 10, 0.65);
+    outline-offset: -3px;
+    border-radius: 4px;
+}
+
+/* =========================================================
+   ACCIONES DEL USUARIO
+   ========================================================= */
+
+.main-navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 0 0 auto;
+}
+
+/* Icono de notificaciones. */
+.notification-button {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+}
+
+.notification-button__icon {
+    width: 21px;
+    height: 21px;
+}
+
+/* Contenedor del menú desplegable. */
+.profile-menu {
+    position: relative;
+}
+
+/* Resumen visible del menú: avatar, nombre y rol. */
+.profile-menu__trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    list-style: none;
+    cursor: pointer;
+    transition: background-color 160ms ease;
+}
+
+/* Quita el triángulo nativo del elemento details. */
+.profile-menu__trigger::-webkit-details-marker {
+    display: none;
+}
+
+.profile-menu__trigger:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.profile-menu__trigger:focus-visible {
+    outline: 3px solid rgba(255, 198, 10, 0.65);
+    outline-offset: 2px;
+}
+
+/* Avatar con las iniciales del usuario. */
+.profile-avatar {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 50%;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+/* Nombre y rol del usuario. */
+.profile-info {
+    display: grid;
+    min-width: 0;
+    line-height: 1.15;
+    text-align: left;
+}
+
+.profile-info__name {
+    max-width: 160px;
+    overflow: hidden;
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-info__role {
+    margin-top: 2px;
+    color: rgba(255, 255, 255, 0.64);
+    font-size: 0.7rem;
+    font-weight: 400;
+}
+
+/* Flecha del menú. */
+.profile-chevron {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    color: rgba(255, 255, 255, 0.64);
+    transition: transform 160ms ease;
+}
+
+/* Gira la flecha cuando el menú está abierto. */
+.profile-menu[open] .profile-chevron {
+    transform: rotate(180deg);
+}
+
+/* Panel desplegable. */
+.profile-menu__panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 50;
+    width: 250px;
+    padding: 8px;
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 18px 40px rgba(26, 31, 83, 0.18);
+}
+
+/* Datos del usuario dentro del panel. */
+.profile-menu__identity {
+    display: grid;
+    gap: 2px;
+    padding: 10px 12px 12px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.profile-menu__identity strong {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.profile-menu__identity span {
+    overflow-wrap: anywhere;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+}
+
+/* Opciones del menú. */
+.profile-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    color: var(--color-primary);
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+        color 160ms ease,
+        background-color 160ms ease;
+}
+
+.profile-menu__item:not(.is-disabled):hover {
+    background: #f5f7fb;
+}
+
+.profile-menu__item.is-disabled {
+    color: var(--color-muted);
+    cursor: default;
+}
+
+.profile-menu__item--logout {
+    color: var(--color-danger);
+}
+
+.profile-menu__item--logout:hover {
+    background: #fdf2f4;
+}
+
+.profile-menu__icon {
+    width: 17px;
+    height: 17px;
+    flex: 0 0 auto;
+}
+
+/* =========================================================
+   PIE DE PÁGINA
+   ========================================================= */
+
+.app-footer {
+    background: var(--color-primary);
+    color: #ffffff;
+}
+
+.app-footer__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: min(1320px, calc(100% - 80px));
+    min-height: 64px;
+    margin: 0 auto;
+    padding: 16px 0;
+}
+
+.app-footer__brand {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.app-footer__text {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.78rem;
+    text-align: right;
+}
+
+/* Respeta la preferencia del usuario de reducir animaciones. */
+@media (prefers-reduced-motion: reduce) {
+    .main-navbar__link,
+    .profile-menu__trigger,
+    .profile-chevron,
+    .profile-menu__item {
+        transition: none;
+    }
+}

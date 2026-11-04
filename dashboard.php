@@ -5,7 +5,8 @@
  * Flujo:
  * 1. Carga la configuración común y las funciones de autenticación.
  * 2. Exige una sesión válida antes de mostrar el contenido.
- * 3. Presenta los datos básicos del usuario autenticado.
+ * 3. Prepara los datos del usuario autenticado.
+ * 4. Presenta el encabezado, el hero, las tarjetas y el pie de página.
  */
 
 require_once __DIR__ . '/src/bootstrap.php';
@@ -17,6 +18,34 @@ requiereLogin();
 $nombre = $_SESSION['nombre_completo'] ?? $_SESSION['username'] ?? '';
 $usuario = $_SESSION['username'] ?? '';
 $rol = $_SESSION['rol'] ?? '';
+
+// Texto visible del rol y permiso para las opciones administrativas.
+$rolesVisibles = [
+    'admin' => 'Administrador',
+    'usuario' => 'Usuario',
+];
+$rolVisible = $rolesVisibles[$rol] ?? ucfirst($rol);
+$esAdmin = $rol === 'admin';
+$paginaActiva = 'inicio';
+
+// Iniciales que se muestran en el avatar del menú de usuario.
+$nombreParaIniciales = trim($nombre) !== '' ? $nombre : $usuario;
+$partesNombre = preg_split('/\s+/', trim($nombreParaIniciales)) ?: [];
+$iniciales = '';
+
+foreach (array_slice($partesNombre, 0, 2) as $parte) {
+    $iniciales .= function_exists('mb_substr')
+        ? mb_substr($parte, 0, 1, 'UTF-8')
+        : substr($parte, 0, 1);
+}
+
+$iniciales = function_exists('mb_strtoupper')
+    ? mb_strtoupper($iniciales, 'UTF-8')
+    : strtoupper($iniciales);
+
+if ($iniciales === '') {
+    $iniciales = 'U';
+}
 ?>
 
 <!DOCTYPE html>
@@ -26,57 +55,52 @@ $rol = $_SESSION['rol'] ?? '';
 
     <title>SISCOIR - Panel principal</title>
 
-    <!-- Estilos base y estilos del panel. -->
+    <!-- Estilos base, estructura del sistema y estilos del panel. -->
     <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
     <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body>
-    <main class="dashboard-page">
-        <section class="dashboard-card" aria-labelledby="dashboard-title">
+    <!-- Encabezado oficial y barra de navegación. -->
+    <?php require __DIR__ . '/views/layouts/app-header.php'; ?>
 
-            <!-- Línea amarilla superior. -->
-            <div class="dashboard-card__accent" aria-hidden="true"></div>
+    <main class="dashboard-main">
+        <div class="dashboard-workspace">
 
-            <!-- Encabezado institucional. -->
-            <header class="dashboard-header">
-                <img
-                    class="dashboard-logo"
-                    src="assets/img/seniat-logo.png"
-                    alt="Logo del SENIAT"
-                >
+            <!-- Bienvenida y acciones principales. -->
+            <section class="dashboard-hero" aria-labelledby="dashboard-title">
+                <div class="dashboard-hero__content">
+                    <p class="dashboard-hero__eyebrow">Panel principal</p>
 
-                <div>
-                    <h1 id="dashboard-title" class="dashboard-title">
-                        SISCOIR
+                    <h1 id="dashboard-title" class="dashboard-hero__title">
+                        Bienvenido de nuevo,
+                        <span><?= htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8') ?></span>
                     </h1>
-                    <p class="dashboard-subtitle">Panel principal</p>
+
+                    <p class="dashboard-hero__status">
+                        <span class="dashboard-hero__status-dot" aria-hidden="true"></span>
+                        Sesión Activa - Aduana Principal Las Piedras - Paraguaná
+                    </p>
                 </div>
-            </header>
 
-            <!-- Contenido del usuario autenticado. -->
-            <div class="dashboard-content">
-                <p class="dashboard-welcome">
-                    Bienvenido,
-                    <strong><?= htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8') ?></strong>
-                </p>
+                <div class="dashboard-hero__actions">
+                    <button class="action-button action-button--primary" type="button" disabled>
+                        Nueva planilla
+                    </button>
 
-                <dl class="dashboard-data">
-                    <div class="dashboard-data__item">
-                        <dt>Usuario</dt>
-                        <dd><?= htmlspecialchars($usuario, ENT_QUOTES, 'UTF-8') ?></dd>
-                    </div>
+                    <button class="action-button action-button--secondary" type="button" disabled>
+                        Consultar planilla
+                    </button>
+                </div>
+            </section>
 
-                    <div class="dashboard-data__item">
-                        <dt>Rol</dt>
-                        <dd><?= htmlspecialchars($rol, ENT_QUOTES, 'UTF-8') ?></dd>
-                    </div>
-                </dl>
+            <!-- Tarjetas de servicios principales. -->
+            <?php require __DIR__ . '/views/dashboard/cards.php'; ?>
 
-                <a class="dashboard-logout" href="logout.php">
-                    Cerrar sesión
-                </a>
-            </div>
-        </section>
+        </div>
     </main>
+
+    <!-- Pie de página institucional. -->
+    <?php require __DIR__ . '/views/layouts/app-footer.php'; ?>
 </body>
 </html>

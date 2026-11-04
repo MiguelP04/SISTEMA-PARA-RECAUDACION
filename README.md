@@ -13,13 +13,18 @@ logout.php                   Cierre de sesión
 views/auth/login.php         Estructura HTML del formulario
 views/auth/recuperar.php     Formulario de recuperación
 views/auth/restablecer.php   Formulario de nueva contraseña
+views/layouts/app-header.php Encabezado oficial y navegación
+views/layouts/app-footer.php Pie de página institucional
+views/layouts/profile-menu.php Menú del usuario autenticado
+views/dashboard/cards.php    Tarjetas del panel principal
 assets/css/base.css          Fuentes, variables y estilos generales
+assets/css/layout.css        Encabezado, navegación y pie de página
 assets/css/login.css         Estilos exclusivos del login
 assets/css/recovery.css      Estilos de recuperación de contraseña
 assets/css/dashboard.css     Estilos del panel principal
 assets/js/login.js           Mostrar u ocultar contraseñas
 assets/fonts/                Fuentes Georama
-assets/img/                  Logo institucional
+assets/img/                  Logos e imágenes institucionales
 config/database.php          Credenciales reales (ignorado por Git)
 config/database.example.php  Plantilla de conexión
 src/bootstrap.php            Inicio de sesión y conexión a la base
