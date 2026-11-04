@@ -1,0 +1,152 @@
+/* =========================================================
+   DASHBOARD
+   Estilos del panel principal de SISCOIR.
+   ========================================================= */
+
+/* Centra la tarjeta del panel en la ventana. */
+.dashboard-page {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: 32px 16px;
+    background: #f5f6fa;
+}
+
+/* Tarjeta principal del panel. */
+.dashboard-card {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 720px;
+    background: var(--color-background);
+    border: 1px solid #eef0f4;
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 24px 60px rgba(1, 1, 1, 0.10),
+        0 2px 8px rgba(1, 1, 1, 0.04);
+}
+
+/* Línea amarilla superior. */
+.dashboard-card__accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--color-secondary);
+}
+
+/* Encabezado con el logo y el nombre del sistema. */
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 28px 36px 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* Logo institucional del panel. */
+.dashboard-logo {
+    width: 120px;
+    height: auto;
+}
+
+/* Título del sistema. */
+.dashboard-title {
+    color: var(--color-primary);
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* Texto debajo del título. */
+.dashboard-subtitle {
+    margin-top: 4px;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+}
+
+/* Contenido principal del panel. */
+.dashboard-content {
+    padding: 0 36px 32px;
+}
+
+/* Mensaje de bienvenida. */
+.dashboard-welcome {
+    margin-top: 24px;
+    color: var(--color-text);
+    font-size: 1.1rem;
+}
+
+/* Lista de datos del usuario autenticado. */
+.dashboard-data {
+    display: grid;
+    gap: 12px;
+    margin: 24px 0 28px;
+}
+
+/* Cada fila de datos. */
+.dashboard-data__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    background: #f8f9fc;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+}
+
+/* Etiqueta del dato. */
+.dashboard-data dt {
+    color: var(--color-muted);
+    font-weight: 500;
+}
+
+/* Valor del dato. */
+.dashboard-data dd {
+    margin: 0;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Botón para cerrar la sesión. */
+.dashboard-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 22px;
+    color: #ffffff;
+    background: var(--color-primary);
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+        background-color 160ms ease,
+        transform 160ms ease;
+}
+
+/* Cambio visual al pasar el mouse. */
+.dashboard-logout:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Anillo de foco para navegación con teclado. */
+.dashboard-logout:focus-visible {
+    outline: 3px solid rgba(255, 198, 10, 0.55);
+    outline-offset: 2px;
+}
+
+/* Respeta la preferencia de reducir animaciones. */
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-logout {
+        transition: none;
+    }
+
+    .dashboard-logout:hover {
+        transform: none;
+    }
+}

@@ -1,0 +1,126 @@
+/* =========================================================
+   RECUPERACIÓN DE CONTRASEÑA
+   Estilos de los pasos de identificación y restablecimiento.
+
+   Reutiliza la tarjeta, los campos y los botones del login.
+   Solo agrega los elementos propios de este flujo.
+   ========================================================= */
+
+/* La tarjeta necesita más ancho para mostrar las preguntas completas. */
+.recovery-shell {
+    max-width: 560px;
+}
+
+/* El formulario de nueva contraseña es más corto que el de preguntas. */
+.recovery-shell--compact {
+    max-width: 460px;
+}
+
+/* Etiqueta que indica el paso actual. */
+.recovery-step {
+    margin-bottom: 10px;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* Nombre del usuario que está respondiendo las preguntas. */
+.recovery-user {
+    margin-top: 20px;
+    padding: 10px 12px;
+    color: var(--color-muted);
+    background: #f8f9fc;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* El nombre del usuario se resalta sin cambiar el tamaño del bloque. */
+.recovery-user strong {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Formulario de recuperación.
+   Mantiene la separación vertical de los campos del login. */
+.recovery-form {
+    margin-top: 24px;
+}
+
+/* Campo sin icono a la izquierda.
+   Se usa en las respuestas de seguridad. */
+.field__input--plain {
+    padding-left: 14px;
+}
+
+/* Texto de ayuda debajo de un campo. */
+.recovery-hint {
+    margin-top: 7px;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+/* Enlace secundario para reiniciar la recuperación. */
+.recovery-link {
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 160ms ease;
+}
+
+/* Cambio visual al pasar el mouse. */
+.recovery-link:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-decoration-color: var(--color-secondary);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+/* Anillo de foco para navegación con teclado. */
+.recovery-link:focus-visible {
+    outline: 3px solid rgba(255, 198, 10, 0.55);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+/* Enlace que se presenta como botón principal. */
+.recovery-button-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 22px;
+    text-align: center;
+    text-decoration: none;
+}
+
+/* Mensaje informativo, por ejemplo cuando vence la solicitud. */
+.login-alert--info {
+    color: #1e3a8a;
+    background: #eff6ff;
+    border-color: rgba(30, 58, 138, 0.20);
+}
+
+/* Mensaje de éxito después de actualizar la contraseña. */
+.login-alert--success {
+    color: #166534;
+    background: #f0fdf4;
+    border-color: rgba(22, 101, 52, 0.22);
+}
+
+/* Respeta la preferencia del usuario de reducir animaciones. */
+@media (prefers-reduced-motion: reduce) {
+    .recovery-link {
+        transition: none;
+    }
+}

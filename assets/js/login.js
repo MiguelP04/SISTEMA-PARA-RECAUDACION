@@ -1,34 +1,53 @@
-/* =========================================================
-   LOGIN
-   Funcionalidad visual del formulario de acceso.
-   ========================================================= */
+/**
+ * Control visual de los campos de contraseña.
+ *
+ * Responsabilidades:
+ * - Alternar la visibilidad de cada contraseña al pulsar su botón.
+ * - Alternar los iconos de ojo abierto y ojo cerrado.
+ * - Actualizar los atributos de accesibilidad del botón.
+ * - Devolver el foco al campo después de cada cambio.
+ *
+ * Cada botón indica el campo que controla mediante aria-controls.
+ * Así el mismo script funciona en el login y en el restablecimiento.
+ */
 
-const passwordInput = document.getElementById("password");
-const passwordToggle = document.querySelector("[data-password-toggle]");
-const eyeOpen = document.querySelector("[data-eye-open]");
-const eyeClosed = document.querySelector("[data-eye-closed]");
+document.querySelectorAll("[data-password-toggle]").forEach((toggle) => {
+    // Obtiene el campo asociado al botón desde aria-controls.
+    const inputId = toggle.getAttribute("aria-controls");
+    const input = inputId ? document.getElementById(inputId) : null;
 
-if (passwordInput && passwordToggle && eyeOpen && eyeClosed) {
-    passwordToggle.addEventListener("click", () => {
-        const isVisible = passwordInput.type === "text";
+    // Los dos iconos deben estar dentro del mismo botón.
+    const eyeOpen = toggle.querySelector("[data-eye-open]");
+    const eyeClosed = toggle.querySelector("[data-eye-closed]");
 
-        // Cambia el tipo de campo para mostrar u ocultar la contraseña.
-        passwordInput.type = isVisible ? "password" : "text";
+    // Si falta algún elemento, este botón no activa el comportamiento.
+    if (!input || !eyeOpen || !eyeClosed) {
+        return;
+    }
 
-        // Actualiza el estado accesible del botón.
-        passwordToggle.setAttribute("aria-pressed", String(!isVisible));
-        passwordToggle.setAttribute(
+    toggle.addEventListener("click", () => {
+        // El campo está visible cuando su tipo es "text".
+        const isVisible = input.type === "text";
+
+        // Cambia el tipo para mostrar u ocultar los caracteres.
+        input.type = isVisible ? "password" : "text";
+
+        // Actualiza el estado accesible del botón para lectores de pantalla.
+        toggle.setAttribute("aria-pressed", String(!isVisible));
+        toggle.setAttribute(
             "aria-label",
             isVisible ? "Mostrar contraseña" : "Ocultar contraseña"
         );
 
-        // Alterna los iconos de ojo abierto y ojo cerrado.
+        // Alterna los iconos: uno se muestra y el otro se oculta.
         eyeOpen.classList.toggle("is-hidden", !isVisible);
         eyeClosed.classList.toggle("is-hidden", isVisible);
 
-        // Mantiene el foco en el campo después de pulsar el ojo.
-        passwordInput.focus({ preventScroll: true });
-        const end = passwordInput.value.length;
-        passwordInput.setSelectionRange(end, end);
+        // Devuelve el foco al campo sin mover la página.
+        input.focus({ preventScroll: true });
+
+        // Coloca el cursor al final del texto para no interrumpir la escritura.
+        const end = input.value.length;
+        input.setSelectionRange(end, end);
     });
-}
+});

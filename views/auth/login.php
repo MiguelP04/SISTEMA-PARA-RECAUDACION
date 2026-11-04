@@ -2,17 +2,27 @@
 /**
  * Vista del formulario de inicio de sesión.
  *
- * Este archivo contiene únicamente la estructura HTML del login.
- * La validación del usuario y la contraseña se realizará más adelante.
+ * Responsabilidades:
+ * - Mostrar el formulario de acceso.
+ * - Conservar el nombre de usuario después de un intento fallido.
+ * - Mostrar el mensaje de error que prepare el controlador.
  *
- * Variables opcionales que puede recibir esta vista:
+ * Esta vista solo presenta la estructura HTML y los mensajes que prepare
+ * el controlador.
+ *
+ * Variables opcionales:
  * - $error: mensaje de error para mostrar al usuario.
  * - $usuario: nombre de usuario ingresado previamente.
+ *
+ * Campos que envía el formulario:
+ * - usuario: nombre de usuario.
+ * - password: contraseña escrita por el usuario.
  */
 $error = $error ?? '';
 $usuario = $usuario ?? '';
 ?>
 
+<!-- Contenedor que centra la tarjeta en la pantalla de escritorio. -->
 <main class="login-page">
     <div class="login-shell">
 
@@ -45,10 +55,14 @@ $usuario = $usuario ?? '';
                 </div>
             <?php endif; ?>
 
-            <!-- Formulario de acceso -->
+            <!-- Formulario de acceso.
+                 Se envía por POST a index.php para que el controlador
+                 procese las credenciales. -->
             <form class="login-form" method="POST" action="index.php">
 
-                <!-- Campo de usuario -->
+                <!-- Campo de usuario.
+                     El valor se conserva con htmlspecialchars para evitar
+                     que el texto escrito se interprete como HTML. -->
                 <div class="field">
                     <label class="field__label" for="usuario">
                         Usuario
@@ -176,7 +190,7 @@ $usuario = $usuario ?? '';
                     Iniciar sesión
                 </button>
 
-                <!-- Enlace preparado para la recuperación de contraseña -->
+                <!-- Enlace de recuperación de contraseña. -->
                 <a class="forgot-link" href="recuperar.php">
                     ¿Olvidó su contraseña?
                 </a>

@@ -1,9 +1,14 @@
 /* =========================================================
    BASE DEL SISTEMA
    Estilos generales, tipografía y variables de color.
+
+   Este archivo no contiene componentes del login; solo las reglas
+   compartidas por todas las páginas de SISCOIR.
    ========================================================= */
 
-/* Georama 400: texto normal */
+/* Georama 400: texto normal.
+   font-display: swap permite mostrar una fuente de respaldo mientras
+   se carga la fuente local. */
 @font-face {
     font-family: "Georama";
     src: url("../fonts/Georama-Regular.ttf") format("truetype");
@@ -12,7 +17,7 @@
     font-display: swap;
 }
 
-/* Georama 500: etiquetas y textos con énfasis medio */
+/* Georama 500: etiquetas y textos con énfasis medio. */
 @font-face {
     font-family: "Georama";
     src: url("../fonts/Georama-Medium.ttf") format("truetype");
@@ -21,7 +26,7 @@
     font-display: swap;
 }
 
-/* Georama 600: títulos y botones */
+/* Georama 600: títulos y botones. */
 @font-face {
     font-family: "Georama";
     src: url("../fonts/Georama-SemiBold.ttf") format("truetype");
@@ -30,7 +35,7 @@
     font-display: swap;
 }
 
-/* Georama 700: textos de mayor peso */
+/* Georama 700: textos de mayor peso. */
 @font-face {
     font-family: "Georama";
     src: url("../fonts/Georama-Bold.ttf") format("truetype");
@@ -39,8 +44,10 @@
     font-display: swap;
 }
 
+/* Variables compartidas por todos los archivos CSS.
+   Cambiar un color aquí actualiza el sistema completo. */
 :root {
-    /* Colores institucionales */
+    /* Colores institucionales. */
     --color-primary: #1a1f53;
     --color-primary-hover: #252b6b;
     --color-secondary: #ffc60a;
@@ -52,23 +59,27 @@
     --color-border: #e5e7eb;
     --color-input-border: #d8dbe3;
 
-    /* Medidas compartidas */
+    /* Medidas compartidas para bordes redondeados. */
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 18px;
 }
 
+/* Hace que el padding y el borde se calculen dentro del ancho total.
+   Evita que los elementos se desborden al sumar medidas. */
 *,
 *::before,
 *::after {
     box-sizing: border-box;
 }
 
+/* Configuración general del documento. */
 html {
     color-scheme: light;
     font-size: 16px;
 }
 
+/* Estilos base del cuerpo de todas las páginas. */
 body {
     margin: 0;
     min-height: 100vh;
@@ -81,6 +92,8 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* Elimina los márgenes por defecto de los textos principales.
+   Cada bloque controla su propio espaciado. */
 h1,
 h2,
 h3,
@@ -88,20 +101,24 @@ p {
     margin: 0;
 }
 
+/* Las imágenes se muestran como bloque y nunca superan su contenedor. */
 img {
     display: block;
     max-width: 100%;
 }
 
+/* Los controles de formulario heredan la tipografía del sistema. */
 button,
 input {
     font: inherit;
 }
 
+/* Los botones muestran el cursor de mano para indicar que son interactivos. */
 button {
     cursor: pointer;
 }
 
+/* Los enlaces heredan el color del elemento que los contiene. */
 a {
     color: inherit;
 }

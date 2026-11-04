@@ -1,8 +1,12 @@
 /* =========================================================
    LOGIN
    Estilos exclusivos de la pantalla de inicio de sesión.
+
+   Este archivo está pensado solo para escritorio. No incluye
+   adaptaciones móviles ni media queries de ancho.
    ========================================================= */
 
+/* Centra la tarjeta en toda la altura de la ventana. */
 .login-page {
     display: grid;
     place-items: center;
@@ -11,12 +15,16 @@
     background: var(--color-background);
 }
 
+/* Limita el ancho máximo del formulario para que no se estire
+   en pantallas grandes. */
 .login-shell {
     width: 100%;
     max-width: 440px;
 }
 
-/* Tarjeta principal */
+/* Tarjeta principal.
+   position: relative permite colocar la franja amarilla y los iconos
+   dentro de sus límites. overflow: hidden recorta la franja superior. */
 .login-card {
     position: relative;
     overflow: hidden;
@@ -29,7 +37,8 @@
         0 2px 8px rgba(1, 1, 1, 0.04);
 }
 
-/* Línea amarilla superior */
+/* Línea amarilla superior.
+   Se posiciona sobre el borde de la tarjeta. */
 .login-card__accent {
     position: absolute;
     top: 0;
@@ -39,7 +48,9 @@
     background: var(--color-secondary);
 }
 
-/* Logo institucional */
+/* Logo institucional.
+   El PNG ya está recortado; este bloque solo controla su tamaño
+   y la separación con el título. */
 .login-card__logo {
     width: 168px;
     height: auto;
@@ -47,7 +58,7 @@
     object-fit: contain;
 }
 
-/* Título del sistema */
+/* Título del sistema. */
 .login-card__title {
     color: var(--color-primary);
     font-size: 1.35rem;
@@ -57,7 +68,7 @@
     letter-spacing: -0.01em;
 }
 
-/* Subtítulo institucional */
+/* Subtítulo institucional. */
 .login-card__subtitle {
     margin-top: 8px;
     color: var(--color-muted);
@@ -67,7 +78,8 @@
     text-align: center;
 }
 
-/* Mensaje de error del login */
+/* Mensaje de error que llega desde el controlador.
+   Se muestra solo cuando la variable $error tiene contenido. */
 .login-alert {
     margin-top: 20px;
     padding: 10px 12px;
@@ -79,13 +91,15 @@
     line-height: 1.4;
 }
 
-/* Formulario */
+/* Formulario.
+   grid + gap separa los campos sin utilizar márgenes individuales. */
 .login-form {
     display: grid;
     gap: 18px;
     margin-top: 28px;
 }
 
+/* Etiqueta de cada campo. */
 .field__label {
     display: block;
     margin-bottom: 8px;
@@ -94,10 +108,13 @@
     font-weight: 500;
 }
 
+/* Contenedor relativo para colocar los iconos dentro del input. */
 .field__control {
     position: relative;
 }
 
+/* Campo de texto.
+   El padding izquierdo deja espacio para el icono del usuario. */
 .field__input {
     width: 100%;
     height: 50px;
@@ -112,20 +129,25 @@
         box-shadow 160ms ease;
 }
 
+/* El campo de contraseña necesita más espacio a la derecha
+   para el botón del ojo. */
 .field__input--password {
     padding-right: 48px;
 }
 
+/* Cambio sutil del borde al pasar el mouse. */
 .field__input:hover {
     border-color: #b9bec9;
 }
 
+/* Resalta el campo activo con el color principal y un halo amarillo. */
 .field__input:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 4px rgba(255, 198, 10, 0.22);
 }
 
-/* Iconos dentro de los campos */
+/* Iconos dentro de los campos.
+   pointer-events: none evita que el icono bloquee el clic en el input. */
 .field__icon {
     position: absolute;
     left: 14px;
@@ -137,7 +159,8 @@
     transform: translateY(-50%);
 }
 
-/* Botón para mostrar u ocultar la contraseña */
+/* Botón para mostrar u ocultar la contraseña.
+   Se coloca a la derecha y se centra verticalmente. */
 .password-toggle {
     position: absolute;
     right: 8px;
@@ -157,26 +180,31 @@
         color 160ms ease;
 }
 
+/* Estado del botón al pasar el mouse. */
 .password-toggle:hover {
     color: var(--color-primary);
     background: #f3f4f6;
 }
 
+/* Anillo de foco visible para navegación con teclado. */
 .password-toggle:focus-visible {
     outline: 2px solid rgba(255, 198, 10, 0.6);
     outline-offset: 2px;
 }
 
+/* Tamaño de los iconos de ojo. */
 .password-toggle__icon {
     width: 20px;
     height: 20px;
 }
 
+/* Utilidad para ocultar uno de los dos iconos del ojo.
+   !important evita que otra regla vuelva a mostrarlo. */
 .is-hidden {
     display: none !important;
 }
 
-/* Botón principal */
+/* Botón principal del formulario. */
 .login-button {
     width: 100%;
     height: 52px;
@@ -194,22 +222,26 @@
         box-shadow 160ms ease;
 }
 
+/* El botón sube ligeramente al pasar el mouse. */
 .login-button:hover {
     background: var(--color-primary-hover);
     box-shadow: 0 10px 22px rgba(26, 31, 83, 0.24);
     transform: translateY(-1px);
 }
 
+/* Al presionar, vuelve a su posición original. */
 .login-button:active {
     transform: translateY(0);
 }
 
+/* Anillo de foco para navegación con teclado. */
 .login-button:focus-visible {
     outline: 3px solid rgba(255, 198, 10, 0.55);
     outline-offset: 2px;
 }
 
-/* Enlace de recuperación */
+/* Enlace de recuperación de contraseña.
+   Se centra con margin automático y ancho ajustado al contenido. */
 .forgot-link {
     width: fit-content;
     margin: 0 auto;
@@ -220,6 +252,7 @@
     text-decoration: none;
 }
 
+/* Subrayado amarillo al pasar el mouse. */
 .forgot-link:hover {
     color: var(--color-primary-hover);
     text-decoration: underline;
@@ -228,19 +261,21 @@
     text-underline-offset: 3px;
 }
 
+/* Anillo de foco para navegación con teclado. */
 .forgot-link:focus-visible {
     outline: 3px solid rgba(255, 198, 10, 0.55);
     outline-offset: 3px;
     border-radius: 2px;
 }
 
-/* Separador y footer del formulario */
+/* Separador y footer institucional dentro de la tarjeta. */
 .login-card__divider {
     height: 1px;
     margin: 26px 0 16px;
     background: var(--color-border);
 }
 
+/* Texto del footer con el nombre de la aduana. */
 .login-card__footer {
     display: flex;
     align-items: center;
@@ -252,13 +287,14 @@
     text-align: center;
 }
 
+/* El icono no se encoge cuando el texto ocupa varias líneas. */
 .login-card__footer-icon {
     flex: 0 0 auto;
     width: 16px;
     height: 16px;
 }
 
-/* Nota de seguridad debajo de la tarjeta */
+/* Nota de seguridad debajo de la tarjeta. */
 .security-note {
     display: flex;
     align-items: center;
@@ -271,13 +307,14 @@
     text-align: left;
 }
 
+/* El icono del candado conserva su tamaño. */
 .security-note__icon {
     flex: 0 0 auto;
     width: 16px;
     height: 16px;
 }
 
-/* Respeta la preferencia de reducir animaciones */
+/* Respeta la preferencia del usuario de reducir animaciones. */
 @media (prefers-reduced-motion: reduce) {
     .field__input,
     .login-button,
