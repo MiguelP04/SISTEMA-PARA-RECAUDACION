@@ -69,7 +69,8 @@ Para portar reportes o lógica de planillas, consultar el sistema anterior en el
 - Único media query permitido salvo necesidad explícita: `@media (prefers-reduced-motion: reduce)`.
 - Tipografía: Georama local en `assets/fonts/`.
 - Tokens de color en `:root` de `assets/css/base.css`; reutilizar esas variables.
-- `assets/img/navbar.png` es la franja oficial actual: **2048×96**. No reemplazarla por imágenes viejas o de baja resolución; `layout.css` debe conservar `max-width: 2048px`.
+- La franja oficial se arma con `navbar-pieces/ministerio-left.png`, `seniat-logo.png` y `navbar-pieces/badge-right.png` dentro de `.official-bar__group`; no volver a una sola imagen aplanada.
+- `assets/img/navbar.png` es solo la versión 2048×96 de respaldo/comparación; no usarla como franja principal ni reemplazarla por imágenes viejas o de baja resolución.
 - `assets/img/seniat-logo-navbar.png` es el logo transparente de la segunda barra azul.
 
 ## Vacíos importantes

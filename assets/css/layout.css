@@ -27,14 +27,39 @@ body {
     border-bottom: 1px solid #e2e8f0;
 }
 
-/* La imagen institucional se muestra completa y centrada.
-   El ancho máximo permite usar la resolución disponible sin ampliarla. */
-.official-bar__image {
-    display: block;
+/* Piezas de la franja oficial alineadas horizontalmente.
+   Los logos quedan a la izquierda y el badge al extremo derecho. */
+.official-bar__group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
     width: 100%;
     max-width: 2048px;
-    height: auto;
     margin: 0 auto;
+    padding: 4px 32px;
+    box-sizing: border-box;
+}
+
+.official-bar__left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.official-bar__piece {
+    display: block;
+    width: auto;
+    height: auto;
+    max-height: 68px;
+}
+
+.official-bar__piece--ministerio {
+    max-width: 520px;
+}
+
+.official-bar__piece--badge {
+    max-height: 40px;
 }
 
 /* =========================================================

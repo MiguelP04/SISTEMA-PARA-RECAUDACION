@@ -27,12 +27,28 @@ $paginaActiva = $paginaActiva ?? 'inicio';
 
     <!-- Franja oficial con logos y badge institucional -->
     <div class="official-bar">
-        <img
-            class="official-bar__image"
-            src="assets/img/navbar.png"
-            alt="Ministerio de Economía y Finanzas, SENIAT y aniversario 200 años"
-            draggable="false"
-        >
+        <div class="official-bar__group">
+            <div class="official-bar__left">
+                <img
+                    class="official-bar__piece official-bar__piece--ministerio"
+                    src="assets/img/navbar-pieces/ministerio-left.png"
+                    alt="Ministerio del Poder Popular de Economía y Finanzas"
+                    draggable="false"
+                >
+                <img
+                    class="official-bar__piece official-bar__piece--seniat"
+                    src="assets/img/seniat-logo.png"
+                    alt="SENIAT"
+                    draggable="false"
+                >
+            </div>
+            <img
+                class="official-bar__piece official-bar__piece--badge"
+                src="assets/img/navbar-pieces/badge-right.png"
+                alt="Aniversario 200 años"
+                draggable="false"
+            >
+        </div>
     </div>
 
     <!-- Barra principal de navegación -->
@@ -68,9 +84,13 @@ $paginaActiva = $paginaActiva ?? 'inicio';
                     Registros
                 </span>
 
-                <span class="main-navbar__link is-disabled" aria-disabled="true">
+                <a
+                    class="main-navbar__link<?= $paginaActiva === 'reportes' ? ' is-active' : '' ?>"
+                    href="reportes.php"
+                    <?= $paginaActiva === 'reportes' ? 'aria-current="page"' : '' ?>
+                >
                     Reportes
-                </span>
+                </a>
 
                 <?php if ($esAdmin): ?>
                     <span class="main-navbar__link is-disabled" aria-disabled="true">
