@@ -37,7 +37,7 @@ body {
     width: 100%;
     max-width: 2048px;
     margin: 0 auto;
-    padding: 4px 32px;
+    padding: 16px 32px;
     box-sizing: border-box;
 }
 
@@ -50,8 +50,8 @@ body {
 .official-bar__piece {
     display: block;
     width: auto;
-    height: auto;
-    max-height: 68px;
+    height: 34px;
+    object-fit: contain;
 }
 
 .official-bar__piece--ministerio {
@@ -59,7 +59,7 @@ body {
 }
 
 .official-bar__piece--badge {
-    max-height: 40px;
+    height: 20px;
 }
 
 /* =========================================================

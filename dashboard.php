@@ -57,7 +57,7 @@ if ($iniciales === '') {
 
     <!-- Estilos base, estructura del sistema y estilos del panel. -->
     <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/layout.css?v=3">
     <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 <body>

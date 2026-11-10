@@ -71,7 +71,7 @@ if ($consultado) {
     <title>SISCOIR - Reportes</title>
 
     <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/layout.css?v=3">
     <link rel="stylesheet" href="assets/css/reportes.css">
 </head>
 <body>
