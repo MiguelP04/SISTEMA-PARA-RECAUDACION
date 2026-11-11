@@ -57,8 +57,8 @@ if ($iniciales === '') {
 
     <!-- Estilos base, estructura del sistema y estilos del panel. -->
     <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/layout.css?v=3">
-    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/layout.css?v=4">
+    <link rel="stylesheet" href="assets/css/dashboard.css?v=2">
 </head>
 <body>
     <!-- Encabezado oficial y barra de navegación. -->
@@ -84,9 +84,9 @@ if ($iniciales === '') {
                 </div>
 
                 <div class="dashboard-hero__actions">
-                    <button class="action-button action-button--primary" type="button" disabled>
+                    <a class="action-button action-button--primary" href="registro_planilla.php">
                         Nueva planilla
-                    </button>
+                    </a>
 
                     <button class="action-button action-button--secondary" type="button" disabled>
                         Consultar planilla

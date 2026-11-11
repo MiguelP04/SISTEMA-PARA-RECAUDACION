@@ -172,6 +172,101 @@ body {
 }
 
 /* =========================================================
+   MENÚ DE REGISTROS
+   ========================================================= */
+
+.nav-menu {
+    position: relative;
+}
+
+.nav-menu__trigger {
+    list-style: none;
+    cursor: pointer;
+}
+
+.nav-menu__trigger::-webkit-details-marker {
+    display: none;
+}
+
+.nav-menu__chevron {
+    width: 14px;
+    height: 14px;
+    margin-left: 6px;
+    flex: 0 0 auto;
+    transition: transform 160ms ease;
+}
+
+.nav-menu[open] .nav-menu__trigger {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-menu[open] .nav-menu__chevron {
+    transform: rotate(180deg);
+}
+
+.nav-menu__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 60;
+    display: grid;
+    gap: 2px;
+    width: 268px;
+    padding: 8px;
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-secondary);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    box-shadow: 0 18px 40px rgba(26, 31, 83, 0.2);
+}
+
+.nav-menu__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    color: var(--color-primary);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition:
+        color 160ms ease,
+        background-color 160ms ease;
+}
+
+.nav-menu__item strong {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.nav-menu__item small {
+    display: block;
+    margin-top: 2px;
+    color: var(--color-muted);
+    font-size: 0.7rem;
+    font-weight: 400;
+}
+
+.nav-menu__item:not(.is-disabled):hover {
+    background: #f5f7fb;
+}
+
+.nav-menu__item.is-current {
+    background: #fff8dd;
+}
+
+.nav-menu__item.is-disabled {
+    color: var(--color-muted);
+    cursor: default;
+}
+
+.nav-menu__item.is-disabled small {
+    color: #9aa1b2;
+}
+
+/* =========================================================
    ACCIONES DEL USUARIO
    ========================================================= */
 
@@ -394,7 +489,9 @@ body {
     .main-navbar__link,
     .profile-menu__trigger,
     .profile-chevron,
-    .profile-menu__item {
+    .profile-menu__item,
+    .nav-menu__chevron,
+    .nav-menu__item {
         transition: none;
     }
 }

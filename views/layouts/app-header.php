@@ -80,9 +80,52 @@ $paginaActiva = $paginaActiva ?? 'inicio';
                     Consultas
                 </span>
 
-                <span class="main-navbar__link is-disabled" aria-disabled="true">
-                    Registros
-                </span>
+                <details class="nav-menu<?= $paginaActiva === 'registros' ? ' is-active' : '' ?>">
+                    <summary
+                        class="main-navbar__link nav-menu__trigger<?= $paginaActiva === 'registros' ? ' is-active' : '' ?>"
+                        <?= $paginaActiva === 'registros' ? 'aria-current="page"' : '' ?>
+                    >
+                        Registros
+
+                        <svg
+                            class="nav-menu__chevron"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+                        </svg>
+                    </summary>
+
+                    <div class="nav-menu__panel">
+                        <a
+                            class="nav-menu__item<?= $paginaActiva === 'registros' ? ' is-current' : '' ?>"
+                            href="registro_planilla.php"
+                        >
+                            <span>
+                                <strong>Planillas</strong>
+                                <small>Alta manual de planilla</small>
+                            </span>
+                        </a>
+
+                        <span class="nav-menu__item is-disabled" aria-disabled="true">
+                            <span>
+                                <strong>Consignatarios</strong>
+                                <small>Próximamente</small>
+                            </span>
+                        </span>
+
+                        <span class="nav-menu__item is-disabled" aria-disabled="true">
+                            <span>
+                                <strong>Agentes aduanales</strong>
+                                <small>Próximamente</small>
+                            </span>
+                        </span>
+                    </div>
+                </details>
 
                 <a
                     class="main-navbar__link<?= $paginaActiva === 'reportes' ? ' is-active' : '' ?>"
@@ -125,3 +168,31 @@ $paginaActiva = $paginaActiva ?? 'inicio';
         </div>
     </div>
 </header>
+
+<script>
+(() => {
+    const menu = document.querySelector('.nav-menu');
+
+    if (!menu) {
+        return;
+    }
+
+    document.addEventListener('click', (event) => {
+        if (menu.open && !menu.contains(event.target)) {
+            menu.open = false;
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && menu.open) {
+            menu.open = false;
+
+            const trigger = menu.querySelector('summary');
+
+            if (trigger) {
+                trigger.focus();
+            }
+        }
+    });
+})();
+</script>
