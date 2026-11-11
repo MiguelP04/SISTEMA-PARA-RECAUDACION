@@ -88,9 +88,9 @@ if ($iniciales === '') {
                         Nueva planilla
                     </a>
 
-                    <button class="action-button action-button--secondary" type="button" disabled>
+                    <a class="action-button action-button--secondary" href="consulta_planilla.php">
                         Consultar planilla
-                    </button>
+                    </a>
                 </div>
             </section>
 

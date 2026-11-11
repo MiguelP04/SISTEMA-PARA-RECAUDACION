@@ -14,6 +14,7 @@
  * - $esAdmin: true cuando el usuario es administrador.
  * - $iniciales: iniciales del avatar.
  * - $paginaActiva: identificador de la página actual.
+ * - $consultaActiva: identificador de la consulta actual.
  */
 $nombre = $nombre ?? ($_SESSION['nombre_completo'] ?? $_SESSION['username'] ?? '');
 $usuario = $usuario ?? ($_SESSION['username'] ?? '');
@@ -21,6 +22,7 @@ $rolVisible = $rolVisible ?? 'Usuario';
 $esAdmin = $esAdmin ?? false;
 $iniciales = $iniciales ?? strtoupper(substr($usuario, 0, 2));
 $paginaActiva = $paginaActiva ?? 'inicio';
+$consultaActiva = $consultaActiva ?? '';
 ?>
 
 <header class="app-header">
@@ -76,9 +78,52 @@ $paginaActiva = $paginaActiva ?? 'inicio';
                     Inicio
                 </a>
 
-                <span class="main-navbar__link is-disabled" aria-disabled="true">
-                    Consultas
-                </span>
+                <details class="nav-menu<?= $paginaActiva === 'consultas' ? ' is-active' : '' ?>">
+                    <summary
+                        class="main-navbar__link nav-menu__trigger<?= $paginaActiva === 'consultas' ? ' is-active' : '' ?>"
+                        <?= $paginaActiva === 'consultas' ? 'aria-current="page"' : '' ?>
+                    >
+                        Consultas
+
+                        <svg
+                            class="nav-menu__chevron"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+                        </svg>
+                    </summary>
+
+                    <div class="nav-menu__panel">
+                        <a
+                            class="nav-menu__item<?= $paginaActiva === 'consultas' && $consultaActiva === 'planillas' ? ' is-current' : '' ?>"
+                            href="consulta_planilla.php"
+                        >
+                            <span>
+                                <strong>Planillas</strong>
+                                <small>Consultar por N° de formulario</small>
+                            </span>
+                        </a>
+
+                        <span class="nav-menu__item is-disabled" aria-disabled="true">
+                            <span>
+                                <strong>Consignatarios</strong>
+                                <small>Próximamente</small>
+                            </span>
+                        </span>
+
+                        <span class="nav-menu__item is-disabled" aria-disabled="true">
+                            <span>
+                                <strong>Agentes aduanales</strong>
+                                <small>Próximamente</small>
+                            </span>
+                        </span>
+                    </div>
+                </details>
 
                 <details class="nav-menu<?= $paginaActiva === 'registros' ? ' is-active' : '' ?>">
                     <summary
@@ -171,20 +216,44 @@ $paginaActiva = $paginaActiva ?? 'inicio';
 
 <script>
 (() => {
-    const menu = document.querySelector('.nav-menu');
+    const menus = Array.from(document.querySelectorAll('.nav-menu'));
 
-    if (!menu) {
+    if (menus.length === 0) {
         return;
     }
 
+    menus.forEach((menu) => {
+        menu.addEventListener('toggle', () => {
+            if (!menu.open) {
+                return;
+            }
+
+            menus.forEach((otroMenu) => {
+                if (otroMenu !== menu) {
+                    otroMenu.open = false;
+                }
+            });
+        });
+    });
+
     document.addEventListener('click', (event) => {
-        if (menu.open && !menu.contains(event.target)) {
-            menu.open = false;
-        }
+        menus.forEach((menu) => {
+            if (menu.open && !menu.contains(event.target)) {
+                menu.open = false;
+            }
+        });
     });
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && menu.open) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        menus.forEach((menu) => {
+            if (!menu.open) {
+                return;
+            }
+
             menu.open = false;
 
             const trigger = menu.querySelector('summary');
@@ -192,7 +261,7 @@ $paginaActiva = $paginaActiva ?? 'inicio';
             if (trigger) {
                 trigger.focus();
             }
-        }
+        });
     });
 })();
 </script>
