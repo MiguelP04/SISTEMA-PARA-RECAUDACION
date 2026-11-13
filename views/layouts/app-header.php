@@ -15,6 +15,7 @@
  * - $iniciales: iniciales del avatar.
  * - $paginaActiva: identificador de la página actual.
  * - $consultaActiva: identificador de la consulta actual.
+ * - $registroActivo: identificador del registro actual.
  */
 $nombre = $nombre ?? ($_SESSION['nombre_completo'] ?? $_SESSION['username'] ?? '');
 $usuario = $usuario ?? ($_SESSION['username'] ?? '');
@@ -23,6 +24,7 @@ $esAdmin = $esAdmin ?? false;
 $iniciales = $iniciales ?? strtoupper(substr($usuario, 0, 2));
 $paginaActiva = $paginaActiva ?? 'inicio';
 $consultaActiva = $consultaActiva ?? '';
+$registroActivo = $registroActivo ?? '';
 ?>
 
 <header class="app-header">
@@ -109,19 +111,15 @@ $consultaActiva = $consultaActiva ?? '';
                             </span>
                         </a>
 
-                        <span class="nav-menu__item is-disabled" aria-disabled="true">
+                        <a
+                            class="nav-menu__item<?= $paginaActiva === 'consultas' && $consultaActiva === 'agentes_consignatarios' ? ' is-current' : '' ?>"
+                            href="consulta_agentes_consignatarios.php"
+                        >
                             <span>
-                                <strong>Consignatarios</strong>
-                                <small>Próximamente</small>
+                                <strong>Agentes/Consignatarios</strong>
+                                <small>Consultar por RIF</small>
                             </span>
-                        </span>
-
-                        <span class="nav-menu__item is-disabled" aria-disabled="true">
-                            <span>
-                                <strong>Agentes aduanales</strong>
-                                <small>Próximamente</small>
-                            </span>
-                        </span>
+                        </a>
                     </div>
                 </details>
 
@@ -147,7 +145,7 @@ $consultaActiva = $consultaActiva ?? '';
 
                     <div class="nav-menu__panel">
                         <a
-                            class="nav-menu__item<?= $paginaActiva === 'registros' ? ' is-current' : '' ?>"
+                            class="nav-menu__item<?= $paginaActiva === 'registros' && $registroActivo === 'planillas' ? ' is-current' : '' ?>"
                             href="registro_planilla.php"
                         >
                             <span>
@@ -156,19 +154,25 @@ $consultaActiva = $consultaActiva ?? '';
                             </span>
                         </a>
 
-                        <span class="nav-menu__item is-disabled" aria-disabled="true">
+                        <a
+                            class="nav-menu__item<?= $paginaActiva === 'registros' && $registroActivo === 'consignatarios' ? ' is-current' : '' ?>"
+                            href="registro_consignatario.php"
+                        >
                             <span>
                                 <strong>Consignatarios</strong>
-                                <small>Próximamente</small>
+                                <small>Alta de consignatario</small>
                             </span>
-                        </span>
+                        </a>
 
-                        <span class="nav-menu__item is-disabled" aria-disabled="true">
+                        <a
+                            class="nav-menu__item<?= $paginaActiva === 'registros' && $registroActivo === 'agentes' ? ' is-current' : '' ?>"
+                            href="registro_agente.php"
+                        >
                             <span>
                                 <strong>Agentes aduanales</strong>
-                                <small>Próximamente</small>
+                                <small>Alta de agente aduanal</small>
                             </span>
-                        </span>
+                        </a>
                     </div>
                 </details>
 

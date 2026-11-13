@@ -17,6 +17,7 @@ $rolesVisibles = [
 $rolVisible = $rolesVisibles[$rol] ?? ucfirst($rol);
 $esAdmin = $rol === 'admin';
 $paginaActiva = 'registros';
+$registroActivo = 'planillas';
 
 $nombreParaIniciales = trim($nombre) !== '' ? $nombre : $usuario;
 $partesNombre = preg_split('/\s+/', trim($nombreParaIniciales)) ?: [];
@@ -143,7 +144,7 @@ foreach ($ramosFormulario as $ramo) {
 
     <link rel="stylesheet" href="assets/css/base.css">
     <link rel="stylesheet" href="assets/css/layout.css?v=4">
-    <link rel="stylesheet" href="assets/css/registros.css?v=1">
+    <link rel="stylesheet" href="assets/css/registros.css?v=2">
 </head>
 <body>
     <?php require __DIR__ . '/views/layouts/app-header.php'; ?>

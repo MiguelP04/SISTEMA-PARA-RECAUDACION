@@ -189,7 +189,8 @@
 }
 
 .registry-field input,
-.registry-field select {
+.registry-field select,
+.registry-field textarea {
     width: 100%;
     height: 46px;
     padding: 0 13px;
@@ -205,8 +206,21 @@
     cursor: pointer;
 }
 
+.registry-field textarea {
+    height: auto;
+    min-height: 88px;
+    padding: 11px 13px;
+    line-height: 1.45;
+    resize: vertical;
+}
+
+.registry-field--span-2 {
+    grid-column: span 2;
+}
+
 .registry-field input:focus-visible,
 .registry-field select:focus-visible,
+.registry-field textarea:focus-visible,
 .ramos-table input:focus-visible,
 .ramos-table select:focus-visible {
     outline: 3px solid rgba(255, 198, 10, 0.6);
@@ -214,8 +228,20 @@
     border-color: var(--color-secondary);
 }
 
-.registry-field input::placeholder {
+.registry-field input::placeholder,
+.registry-field textarea::placeholder {
     color: #9aa1b2;
+}
+
+.rif-input-group {
+    display: grid;
+    grid-template-columns: 74px minmax(0, 1fr);
+    gap: 8px;
+}
+
+.rif-input-group select {
+    padding: 0 8px;
+    text-align: center;
 }
 
 /* =========================================================

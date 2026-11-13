@@ -109,8 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <link rel="stylesheet" href="assets/css/base.css">
     <link rel="stylesheet" href="assets/css/layout.css?v=4">
-    <link rel="stylesheet" href="assets/css/registros.css?v=1">
-    <link rel="stylesheet" href="assets/css/consultas.css?v=1">
+    <link rel="stylesheet" href="assets/css/registros.css?v=2">
+    <link rel="stylesheet" href="assets/css/consultas.css?v=2">
 </head>
 <body>
     <?php require __DIR__ . '/views/layouts/app-header.php'; ?>
