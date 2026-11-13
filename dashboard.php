@@ -11,6 +11,7 @@
 
 require_once __DIR__ . '/src/bootstrap.php';
 require_once __DIR__ . '/src/auth.php';
+require_once __DIR__ . '/src/dashboard.php';
 
 requiereLogin();
 
@@ -27,6 +28,9 @@ $rolesVisibles = [
 $rolVisible = $rolesVisibles[$rol] ?? ucfirst($rol);
 $esAdmin = $rol === 'admin';
 $paginaActiva = 'inicio';
+$resumenInicio = obtenerResumenDashboard($conn);
+$mesInicio = date('Y-m-01');
+$mesFin = date('Y-m-t');
 
 // Iniciales que se muestran en el avatar del menú de usuario.
 $nombreParaIniciales = trim($nombre) !== '' ? $nombre : $usuario;

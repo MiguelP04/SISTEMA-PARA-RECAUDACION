@@ -228,6 +228,20 @@
     line-height: 1.4;
 }
 
+/* Información complementaria del indicador. */
+.service-card__detail {
+    margin-top: 6px;
+    color: #8a92a3;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+/* Alerta para pendientes vencidas. */
+.service-card__detail.is-alert {
+    color: var(--color-danger);
+    font-weight: 600;
+}
+
 /* Enlace de acción al pie de la tarjeta. */
 .service-card__link {
     display: inline-flex;

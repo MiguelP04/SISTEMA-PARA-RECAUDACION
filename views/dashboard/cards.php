@@ -1,12 +1,16 @@
 <?php
-/**
- * Tarjetas de acceso rápido del panel principal.
- *
- * Los valores se muestran como guiones hasta conectar las consultas
- * reales de planillas y recaudación.
- */
+$escaparInicio = static fn ($valor): string => htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
+
+$planillasMes = $resumenInicio['planillas_mes'];
+$recaudadoMes = $resumenInicio['recaudado_mes'];
+$pendientes = $resumenInicio['pendientes'];
+$vencidas = $resumenInicio['vencidas'];
+$ultimaPlanilla = $resumenInicio['ultima_planilla'];
+$ultimoPago = $resumenInicio['ultimo_pago'];
+$enlaceReporteMes = 'reportes.php?desde=' . urlencode($mesInicio) . '&hasta=' . urlencode($mesFin) . '&consultar=1';
 ?>
-<section class="service-grid" aria-label="Servicios principales">
+
+<section class="service-grid" aria-label="Resumen operativo">
 
     <article class="service-card">
         <span class="service-card__icon" aria-hidden="true">
@@ -25,18 +29,32 @@
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    d="M7.5 8.25h3m-3 3h6m-6 3h4.5"
+                    d="M7.5 8.25h3m-3 3h6m-3 3h3"
                 />
             </svg>
         </span>
 
-        <p class="service-card__eyebrow">Movimiento reciente</p>
-        <h2 class="service-card__title">Planillas recientes</h2>
-        <p class="service-card__value">—</p>
-        <p class="service-card__caption">Última actualización</p>
+        <p class="service-card__eyebrow">Movimiento del mes</p>
+        <h2 class="service-card__title">Planillas emitidas</h2>
+        <p class="service-card__value"><?= $escaparInicio($planillasMes['cantidad']) ?></p>
+        <p class="service-card__caption">
+            <?php if ($planillasMes['cantidad'] > 0): ?>
+                Bs <?= $escaparInicio(formatearMontoDashboard($planillasMes['monto'])) ?> emitidos este mes
+            <?php else: ?>
+                Sin planillas registradas este mes
+            <?php endif; ?>
+        </p>
+        <p class="service-card__detail">
+            <?php if ($ultimaPlanilla !== null && $ultimaPlanilla['nro_formulario'] !== ''): ?>
+                Última: N° <?= $escaparInicio($ultimaPlanilla['nro_formulario']) ?>
+                · <?= $escaparInicio(formatearFechaDashboard($ultimaPlanilla['fecha_emision'])) ?>
+            <?php else: ?>
+                Aún no hay planillas registradas
+            <?php endif; ?>
+        </p>
 
-        <span class="service-card__link is-disabled" aria-disabled="true">
-            Ver planillas
+        <a class="service-card__link" href="consulta_planilla.php">
+            Consultar planilla
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -45,13 +63,9 @@
                 stroke="currentColor"
                 aria-hidden="true"
             >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
-        </span>
+        </a>
     </article>
 
     <article class="service-card">
@@ -72,12 +86,28 @@
         </span>
 
         <p class="service-card__eyebrow">Resumen financiero</p>
-        <h2 class="service-card__title">Control de recaudación</h2>
-        <p class="service-card__value service-card__value--currency">Bs —</p>
-        <p class="service-card__caption">Total del mes</p>
+        <h2 class="service-card__title">Recaudación del mes</h2>
+        <p class="service-card__value service-card__value--currency">
+            Bs <?= $escaparInicio(formatearMontoDashboard($recaudadoMes['monto'])) ?>
+        </p>
+        <p class="service-card__caption">
+            <?php if ($recaudadoMes['cantidad'] > 0): ?>
+                <?= $escaparInicio($recaudadoMes['cantidad']) ?> planilla<?= $recaudadoMes['cantidad'] === 1 ? '' : 's' ?> pagada<?= $recaudadoMes['cantidad'] === 1 ? '' : 's' ?>
+            <?php else: ?>
+                Sin recaudaciones este mes
+            <?php endif; ?>
+        </p>
+        <p class="service-card__detail">
+            <?php if ($ultimoPago !== null): ?>
+                Último pago: <?= $escaparInicio(formatearFechaDashboard($ultimoPago['fecha_cancelacion'])) ?>
+                · Bs <?= $escaparInicio(formatearMontoDashboard($ultimoPago['monto'])) ?>
+            <?php else: ?>
+                Aún no hay pagos registrados
+            <?php endif; ?>
+        </p>
 
-        <span class="service-card__link is-disabled" aria-disabled="true">
-            Ver recaudación
+        <a class="service-card__link" href="<?= $escaparInicio($enlaceReporteMes) ?>">
+            Ver reporte del mes
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -86,13 +116,9 @@
                 stroke="currentColor"
                 aria-hidden="true"
             >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
-        </span>
+        </a>
     </article>
 
     <article class="service-card">
@@ -113,12 +139,25 @@
         </span>
 
         <p class="service-card__eyebrow">Seguimiento operativo</p>
-        <h2 class="service-card__title">Planillas pendientes</h2>
-        <p class="service-card__value">—</p>
-        <p class="service-card__caption">Por revisar</p>
+        <h2 class="service-card__title">Pendientes por recaudar</h2>
+        <p class="service-card__value"><?= $escaparInicio($pendientes['cantidad']) ?></p>
+        <p class="service-card__caption">
+            <?php if ($pendientes['cantidad'] > 0): ?>
+                Bs <?= $escaparInicio(formatearMontoDashboard($pendientes['monto'])) ?> por recaudar
+            <?php else: ?>
+                Sin saldo pendiente
+            <?php endif; ?>
+        </p>
+        <p class="service-card__detail<?= $vencidas['cantidad'] > 0 ? ' is-alert' : '' ?>">
+            <?php if ($vencidas['cantidad'] > 0): ?>
+                <?= $escaparInicio($vencidas['cantidad']) ?> vencida<?= $vencidas['cantidad'] === 1 ? '' : 's' ?>
+            <?php else: ?>
+                Sin planillas vencidas
+            <?php endif; ?>
+        </p>
 
-        <span class="service-card__link is-disabled" aria-disabled="true">
-            Ver pendientes
+        <a class="service-card__link" href="consulta_planilla.php">
+            Buscar planilla
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -127,13 +166,9 @@
                 stroke="currentColor"
                 aria-hidden="true"
             >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
-        </span>
+        </a>
     </article>
 
 </section>
