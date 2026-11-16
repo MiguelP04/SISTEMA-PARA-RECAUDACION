@@ -14,6 +14,20 @@
     padding: 44px 0 64px;
 }
 
+.reportes-modulo {
+    transition: opacity 0.18s ease;
+}
+
+.reportes-modulo.is-loading {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+#report-filters-title,
+#report-summary-title {
+    scroll-margin-top: 24px;
+}
+
 /* =========================================================
    ENCABEZADO DEL MÓDULO
    ========================================================= */
@@ -556,6 +570,7 @@
 
 /* Respeta la preferencia del usuario de reducir animaciones. */
 @media (prefers-reduced-motion: reduce) {
+    .reportes-modulo,
     .report-card,
     .report-button,
     .report-export-button {

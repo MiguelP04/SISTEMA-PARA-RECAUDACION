@@ -12,6 +12,14 @@ require_once __DIR__ . '/src/auth.php';
 require_once __DIR__ . '/src/reportes.php';
 require_once __DIR__ . '/src/reportes_diario.php';
 
+$esAjax = strtolower(trim((string) ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? ''))) === 'xmlhttprequest';
+
+if ($esAjax && !estaAutenticado()) {
+    http_response_code(401);
+    header('Content-Type: text/plain; charset=utf-8');
+    exit('Sesión no válida.');
+}
+
 requiereLogin();
 
 // Datos del usuario autenticado para el encabezado.
@@ -77,6 +85,12 @@ if ($consultado) {
             : obtenerResumenReporte($conn, $tipo, $fechaDesde, $fechaHasta);
     }
 }
+
+if ($esAjax) {
+    header('Content-Type: text/html; charset=utf-8');
+    require __DIR__ . '/views/reportes/modulo.php';
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +102,7 @@ if ($consultado) {
 
     <link rel="stylesheet" href="assets/css/base.css">
     <link rel="stylesheet" href="assets/css/layout.css?v=4">
-    <link rel="stylesheet" href="assets/css/reportes.css?v=2">
+    <link rel="stylesheet" href="assets/css/reportes.css?v=3">
 </head>
 <body>
     <?php require __DIR__ . '/views/layouts/app-header.php'; ?>
@@ -109,25 +123,13 @@ if ($consultado) {
                 </p>
             </section>
 
-            <?php require __DIR__ . '/views/reportes/catalogo.php'; ?>
-
-            <?php require __DIR__ . ($esReporteDiario
-                ? '/views/reportes/filtros-diario.php'
-                : '/views/reportes/filtros.php'
-            ); ?>
-
-            <?php if ($consultado && empty($errores) && $resumen !== null): ?>
-                <?php require __DIR__ . ($esReporteDiario
-                    ? '/views/reportes/resumen-diario.php'
-                    : '/views/reportes/resumen.php'
-                ); ?>
-            <?php endif; ?>
+            <?php require __DIR__ . '/views/reportes/modulo.php'; ?>
 
         </div>
     </main>
 
     <?php require __DIR__ . '/views/layouts/app-footer.php'; ?>
 
-    <script src="assets/js/reportes.js" defer></script>
+    <script src="assets/js/reportes.js?v=2" defer></script>
 </body>
 </html>
