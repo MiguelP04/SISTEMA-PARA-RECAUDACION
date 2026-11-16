@@ -10,6 +10,7 @@
 require_once __DIR__ . '/src/bootstrap.php';
 require_once __DIR__ . '/src/auth.php';
 require_once __DIR__ . '/src/reportes.php';
+require_once __DIR__ . '/src/reportes_diario.php';
 
 requiereLogin();
 
@@ -44,9 +45,22 @@ if ($iniciales === '') {
     $iniciales = 'U';
 }
 
-$fechaDesde = trim($_GET['desde'] ?? date('Y-m-d'));
-$fechaHasta = trim($_GET['hasta'] ?? date('Y-m-d'));
+$tiposReporte = obtenerTiposReporte();
+$tipoParametro = $_GET['tipo'] ?? 'pagado';
+$tipo = is_string($tipoParametro) ? trim($tipoParametro) : '';
+$reporte = obtenerTipoReporte($tipo);
+
+if ($reporte === null) {
+    http_response_code(400);
+    exit('Tipo de reporte no válido.');
+}
+
+$fechaDesdeParametro = $_GET['desde'] ?? date('Y-m-d');
+$fechaHastaParametro = $_GET['hasta'] ?? date('Y-m-d');
+$fechaDesde = is_string($fechaDesdeParametro) ? trim($fechaDesdeParametro) : '';
+$fechaHasta = is_string($fechaHastaParametro) ? trim($fechaHastaParametro) : '';
 $consultado = isset($_GET['consultar']);
+$esReporteDiario = $tipo === 'diario';
 $errores = [];
 $resumen = null;
 
@@ -58,7 +72,9 @@ if ($consultado) {
     }
 
     if (empty($errores)) {
-        $resumen = obtenerResumenReporte($conn, $fechaDesde, $fechaHasta);
+        $resumen = $esReporteDiario
+            ? obtenerResumenReporteDiario($conn, $fechaDesde, $fechaHasta)
+            : obtenerResumenReporte($conn, $tipo, $fechaDesde, $fechaHasta);
     }
 }
 ?>
@@ -72,7 +88,7 @@ if ($consultado) {
 
     <link rel="stylesheet" href="assets/css/base.css">
     <link rel="stylesheet" href="assets/css/layout.css?v=4">
-    <link rel="stylesheet" href="assets/css/reportes.css">
+    <link rel="stylesheet" href="assets/css/reportes.css?v=2">
 </head>
 <body>
     <?php require __DIR__ . '/views/layouts/app-header.php'; ?>
@@ -88,17 +104,23 @@ if ($consultado) {
                 </h1>
 
                 <p class="reports-hero__text">
-                    Selecciona el tipo de planilla que deseas generar. Por ahora está disponible
-                    el reporte de planillas pagadas; los demás se incorporarán progresivamente.
+                    Selecciona el reporte que deseas generar, indica el rango de fechas
+                    y descarga el detalle en PDF o Excel.
                 </p>
             </section>
 
             <?php require __DIR__ . '/views/reportes/catalogo.php'; ?>
 
-            <?php require __DIR__ . '/views/reportes/filtros.php'; ?>
+            <?php require __DIR__ . ($esReporteDiario
+                ? '/views/reportes/filtros-diario.php'
+                : '/views/reportes/filtros.php'
+            ); ?>
 
             <?php if ($consultado && empty($errores) && $resumen !== null): ?>
-                <?php require __DIR__ . '/views/reportes/resumen.php'; ?>
+                <?php require __DIR__ . ($esReporteDiario
+                    ? '/views/reportes/resumen-diario.php'
+                    : '/views/reportes/resumen.php'
+                ); ?>
             <?php endif; ?>
 
         </div>

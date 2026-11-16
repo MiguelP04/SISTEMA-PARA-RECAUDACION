@@ -5,13 +5,17 @@
  * No muestra el detalle de las planillas: solo totales y accesos de descarga.
  *
  * Variables disponibles:
- * - $resumen, $fechaDesde, $fechaHasta.
+ * - $reporte, $tipo, $resumen, $fechaDesde, $fechaHasta.
  */
 $fechaDesdeTexto = formatearFechaReporte($fechaDesde);
 $fechaHastaTexto = formatearFechaReporte($fechaHasta);
 $hayResultados = $resumen['total'] > 0;
+$etiquetaTotal = $reporte['total'] === 'TOTAL GENERAL RECAUDADO'
+    ? 'Total general recaudado'
+    : 'Total general';
 
 $parametrosExportacion = [
+    'tipo' => $tipo,
     'desde' => $fechaDesde,
     'hasta' => $fechaHasta,
 ];
@@ -28,7 +32,7 @@ $urlExcel = 'reporte_exportar.php?' . http_build_query(
         <div>
             <p class="report-summary__eyebrow">Resultado de la consulta</p>
             <h2 id="report-summary-title" class="report-summary__title">
-                Reporte de Planillas por Fecha de Cancelación
+                <?= htmlspecialchars('Reporte de ' . $reporte['titulo'], ENT_QUOTES, 'UTF-8') ?>
             </h2>
         </div>
 
@@ -47,7 +51,7 @@ $urlExcel = 'reporte_exportar.php?' . http_build_query(
         </article>
 
         <article class="report-stat">
-            <p class="report-stat__label">Total general</p>
+            <p class="report-stat__label"><?= htmlspecialchars($etiquetaTotal, ENT_QUOTES, 'UTF-8') ?></p>
             <p class="report-stat__value report-stat__value--currency">
                 Bs <?= htmlspecialchars(formatearMontoReporte($resumen['monto']), ENT_QUOTES, 'UTF-8') ?>
             </p>
@@ -55,42 +59,23 @@ $urlExcel = 'reporte_exportar.php?' . http_build_query(
     </div>
 
     <div class="report-summary__breakdown">
-        <h3 class="report-summary__breakdown-title">Totales por aduana y denominación</h3>
+        <h3 class="report-summary__breakdown-title">Totales por tipo de contribuyente</h3>
 
-        <?php if (!empty($resumen['por_aduana'])): ?>
+        <?php if (!empty($resumen['por_grupo'])): ?>
             <div class="report-breakdown">
-                <?php foreach ($resumen['por_aduana'] as $aduana): ?>
-                    <div class="report-breakdown__group">
-                        <div class="report-breakdown__row report-breakdown__row--aduana">
-                            <div class="report-breakdown__name">
-                                <strong><?= htmlspecialchars($aduana['codigo_aduana'], ENT_QUOTES, 'UTF-8') ?></strong>
-                                <span><?= htmlspecialchars($aduana['nombre_de_la_aduana'], ENT_QUOTES, 'UTF-8') ?></span>
-                            </div>
-
-                            <div class="report-breakdown__count">
-                                <?= number_format((int) $aduana['total'], 0, ',', '.') ?> planillas
-                            </div>
-
-                            <div class="report-breakdown__amount">
-                                Bs <?= htmlspecialchars(formatearMontoReporte($aduana['monto']), ENT_QUOTES, 'UTF-8') ?>
-                            </div>
+                <?php foreach ($resumen['por_grupo'] as $grupo): ?>
+                    <div class="report-breakdown__row report-breakdown__row--grupo">
+                        <div class="report-breakdown__name">
+                            <strong><?= htmlspecialchars($grupo['grupo'], ENT_QUOTES, 'UTF-8') ?></strong>
                         </div>
 
-                        <?php foreach ($aduana['por_forma'] as $forma): ?>
-                            <div class="report-breakdown__row report-breakdown__row--forma">
-                                <div class="report-breakdown__name report-breakdown__name--forma">
-                                    <span><?= htmlspecialchars($forma['denominacion_forma'], ENT_QUOTES, 'UTF-8') ?></span>
-                                </div>
+                        <div class="report-breakdown__count">
+                            <?= number_format((int) $grupo['total'], 0, ',', '.') ?> planillas
+                        </div>
 
-                                <div class="report-breakdown__count">
-                                    <?= number_format((int) $forma['total'], 0, ',', '.') ?> planillas
-                                </div>
-
-                                <div class="report-breakdown__amount">
-                                    Bs <?= htmlspecialchars(formatearMontoReporte($forma['monto']), ENT_QUOTES, 'UTF-8') ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+                        <div class="report-breakdown__amount">
+                            Bs <?= htmlspecialchars(formatearMontoReporte($grupo['monto']), ENT_QUOTES, 'UTF-8') ?>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>

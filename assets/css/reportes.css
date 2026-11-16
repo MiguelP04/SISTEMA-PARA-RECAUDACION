@@ -106,15 +106,33 @@
     gap: 14px;
     min-height: 104px;
     padding: 16px;
+    color: inherit;
     background: #fbfcff;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
+    text-decoration: none;
 }
 
 .report-card--available {
     background: #fffdf2;
     border-color: #efd27c;
     box-shadow: inset 3px 0 0 var(--color-secondary);
+}
+
+.report-card--available:hover {
+    background: #fffbe6;
+    border-color: var(--color-secondary);
+}
+
+.report-card.is-selected {
+    background: #fff9dc;
+    border-color: var(--color-primary);
+    box-shadow: inset 3px 0 0 var(--color-primary), 0 8px 20px rgba(26, 31, 83, 0.12);
+}
+
+.report-card:focus-visible {
+    outline: 3px solid rgba(255, 198, 10, 0.6);
+    outline-offset: 2px;
 }
 
 .report-card.is-disabled {
@@ -456,7 +474,8 @@
     border-top: 2px solid #dfe5ee;
 }
 
-.report-breakdown__row--aduana {
+.report-breakdown__row--aduana,
+.report-breakdown__row--grupo {
     background: #f7f8fc;
 }
 
@@ -537,6 +556,7 @@
 
 /* Respeta la preferencia del usuario de reducir animaciones. */
 @media (prefers-reduced-motion: reduce) {
+    .report-card,
     .report-button,
     .report-export-button {
         transition: none;

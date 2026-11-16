@@ -2,12 +2,88 @@
 /**
  * Consultas y utilidades para el módulo de reportes.
  *
- * Todas las consultas de este archivo trabajan sobre la tabla principal
- * planillas_emitidas y respetan las reglas del sistema:
- * - Solo planillas con fecha_cancelacion válida.
- * - Se excluyen las planillas anuladas.
- * - El monto se toma de monto2.
+ * Los reportes trabajan sobre planillas_emitidas, usan monto2 como monto
+ * principal y excluyen las planillas anuladas.
  */
+
+/**
+ * Devuelve la definición de los reportes disponibles.
+ *
+ * @return array<string, array<string, string>>
+ */
+function obtenerTiposReporte(): array
+{
+    return [
+        'liquidado' => [
+            'titulo' => 'Planillas Liquidadas',
+            'descripcion' => 'Planillas registradas por fecha de liquidación.',
+            'icono' => 'documento',
+            'condicion' => 'p.fecha_contabilidad_liq BETWEEN ? AND ?',
+            'orden' => 'p.nro_formulario',
+            'etiqueta_desde' => 'Fecha de liquidación desde',
+            'etiqueta_hasta' => 'Fecha de liquidación hasta',
+            'total' => 'TOTAL GENERAL',
+            'archivo' => 'reporte_planillas_liquidadas',
+        ],
+        'pagado' => [
+            'titulo' => 'Planillas Pagadas',
+            'descripcion' => 'Planillas canceladas dentro del rango de fechas seleccionado.',
+            'icono' => 'check',
+            'condicion' => "p.fecha_cancelacion BETWEEN ? AND ? AND p.fecha_cancelacion > '0000-00-00'",
+            'orden' => 'p.nro_formulario',
+            'etiqueta_desde' => 'Fecha de pago desde',
+            'etiqueta_hasta' => 'Fecha de pago hasta',
+            'total' => 'TOTAL GENERAL RECAUDADO',
+            'archivo' => 'reporte_planillas_pagadas',
+        ],
+        'diario' => [
+            'titulo' => 'Planillas pagadas (diario)',
+            'descripcion' => 'Reporte diario de planillas canceladas con detalle por aduana y forma.',
+            'icono' => 'check',
+            'condicion' => "p.fecha_cancelacion BETWEEN ? AND ? AND p.fecha_cancelacion > '0000-00-00'",
+            'orden' => 'p.nro_formulario',
+            'etiqueta_desde' => 'Fecha desde',
+            'etiqueta_hasta' => 'Fecha hasta',
+            'total' => 'TOTAL GENERAL',
+            'archivo' => 'reporte_planillas_cancelacion',
+        ],
+        'derechos_pendientes' => [
+            'titulo' => 'Derechos Pendientes',
+            'descripcion' => 'Derechos vencidos registrados en el período de contabilidad seleccionado.',
+            'icono' => 'alerta',
+            'condicion' => 'p.fecha_vencimiento < CURDATE() AND p.fecha_contabilidad_liq BETWEEN ? AND ?',
+            'orden' => 'p.fecha_vencimiento, p.nro_formulario',
+            'etiqueta_desde' => 'Período de contabilidad desde',
+            'etiqueta_hasta' => 'Período de contabilidad hasta',
+            'total' => 'TOTAL GENERAL',
+            'archivo' => 'reporte_derechos_pendientes',
+        ],
+        'derechos_pendientes_pagados' => [
+            'titulo' => 'Derechos Pendientes Pagados',
+            'descripcion' => 'Derechos cancelados después de su fecha de vencimiento.',
+            'icono' => 'check',
+            'condicion' => "p.fecha_cancelacion > p.fecha_vencimiento AND p.fecha_cancelacion IS NOT NULL AND p.fecha_cancelacion <> '0000-00-00' AND p.fecha_emision BETWEEN ? AND ?",
+            'orden' => 'p.nro_formulario',
+            'etiqueta_desde' => 'Período de emisión desde',
+            'etiqueta_hasta' => 'Período de emisión hasta',
+            'total' => 'TOTAL GENERAL RECAUDADO',
+            'archivo' => 'reporte_derechos_pendientes_pagados',
+        ],
+    ];
+}
+
+/**
+ * Obtiene la definición de un reporte por su identificador.
+ *
+ * @param string $tipo Identificador del reporte.
+ * @return array<string, string>|null
+ */
+function obtenerTipoReporte(string $tipo): ?array
+{
+    $tipos = obtenerTiposReporte();
+
+    return $tipos[$tipo] ?? null;
+}
 
 /**
  * Comprueba que una fecha tenga el formato Y-m-d y sea real.
@@ -60,7 +136,47 @@ function formatearMontoReporte(mixed $monto): string
 }
 
 /**
- * Convierte una fila de la consulta en valores listos para mostrar o exportar.
+ * Devuelve el grupo de contribuyente usado por los reportes.
+ *
+ * @param string $rif RIF del consignatario.
+ * @return string Grupo visible del contribuyente.
+ */
+function obtenerGrupoContribuyente(string $rif): string
+{
+    $primeraLetra = strtoupper(substr(trim($rif), 0, 1));
+
+    if ($primeraLetra === 'G') {
+        return 'Sector Público';
+    }
+
+    if ($primeraLetra === 'J') {
+        return 'Sector Privado';
+    }
+
+    if ($primeraLetra === 'V' || $primeraLetra === 'E') {
+        return 'Natural';
+    }
+
+    return 'Otro';
+}
+
+/**
+ * Devuelve la expresión SQL que clasifica el RIF del contribuyente.
+ *
+ * @return string Expresión CASE para ordenar y agrupar.
+ */
+function obtenerCasoGrupoContribuyente(): string
+{
+    return "CASE
+                WHEN UPPER(c.rif_consignatario) LIKE 'G%' THEN 1
+                WHEN UPPER(c.rif_consignatario) LIKE 'J%' THEN 2
+                WHEN UPPER(c.rif_consignatario) LIKE 'V%' OR UPPER(c.rif_consignatario) LIKE 'E%' THEN 3
+                ELSE 4
+            END";
+}
+
+/**
+ * Convierte una fila del reporte en valores listos para mostrar o exportar.
  *
  * @param array $fila Fila obtenida de obtenerDetalleReporte().
  * @return array Valores formateados para el reporte.
@@ -70,36 +186,26 @@ function formatearFilaReporte(array $fila): array
     $rif = trim((string) ($fila['rif_consignatario'] ?? ''));
     $nombre = trim((string) ($fila['nombre_consignatario'] ?? ''));
 
-    if ($rif !== '' && $nombre !== '') {
-        $contribuyente = $rif . ' - ' . $nombre;
-    } elseif ($nombre !== '') {
-        $contribuyente = $nombre;
-    } else {
-        $contribuyente = $rif;
-    }
-
     return [
-        'codigo_aduana' => (string) ($fila['codigo_aduana'] ?? ''),
-        'nombre_aduana' => (string) ($fila['nombre_de_la_aduana'] ?? $fila['codigo_aduana'] ?? ''),
-        'cod_de_forma' => (string) ($fila['cod_de_forma'] ?? ''),
-        'forma_codigo' => trim((string) ($fila['forma_codigo'] ?? '')),
-        'denominacion_forma' => trim((string) ($fila['denominacion_forma'] ?? '')),
-        'tipo_de_planilla' => (string) ($fila['tipo_de_planilla'] ?? ''),
+        'grupo' => obtenerGrupoContribuyente($rif),
         'nro_declaracion' => (string) ($fila['nro_declaracion'] ?? ''),
         'nro_formulario' => (string) ($fila['nro_formulario'] ?? ''),
         'fecha_liquidacion' => formatearFechaReporte($fila['fecha_contabilidad_liq'] ?? null),
-        'nro_liquidacion' => (string) ($fila['nro_liquidacion'] ?? ''),
-        'contribuyente' => $contribuyente,
+        'rif_consignatario' => $rif,
+        'nombre_consignatario' => $nombre,
+        'fecha_pago' => formatearFechaReporte($fila['fecha_cancelacion'] ?? null),
         'monto' => formatearMontoReporte($fila['monto2'] ?? 0),
         'monto_numero' => (float) ($fila['monto2'] ?? 0),
+        'tipo_forma' => (string) ($fila['cod_de_forma'] ?? ''),
+        'concepto' => (string) ($fila['tipo_de_planilla'] ?? ''),
+        'codigo_aduana' => (string) ($fila['codigo_aduana'] ?? ''),
         'fecha_vencimiento' => formatearFechaReporte($fila['fecha_vencimiento'] ?? null),
-        'fecha_cancelacion' => formatearFechaReporte($fila['fecha_cancelacion'] ?? null),
-        'dias_mora' => $fila['dias_mora'] === null ? 'N/A' : (string) (int) $fila['dias_mora'],
+        'estatus' => (string) ($fila['cod_status'] ?? ''),
     ];
 }
 
 /**
- * Construye la condición común del reporte y enlaza sus parámetros.
+ * Enlaza las fechas del reporte a una sentencia preparada.
  *
  * @param mysqli_stmt $stmt Sentencia preparada.
  * @param string $fechaDesde Fecha inicial.
@@ -115,92 +221,68 @@ function enlazarParametrosReporte(
 }
 
 /**
- * Obtiene el resumen de planillas agrupado por aduana y denominación.
+ * Obtiene el resumen del reporte agrupado por tipo de contribuyente.
  *
  * @param mysqli $conn Conexión activa.
+ * @param string $tipo Tipo de reporte.
  * @param string $fechaDesde Fecha inicial.
  * @param string $fechaHasta Fecha final.
- * @return array Resumen con total, monto y detalle por aduana y forma.
+ * @return array Resumen con total, monto y detalle por grupo.
  */
 function obtenerResumenReporte(
     mysqli $conn,
+    string $tipo,
     string $fechaDesde,
     string $fechaHasta
 ): array {
+    $reporte = obtenerTipoReporte($tipo);
+    $resumen = [
+        'total' => 0,
+        'monto' => 0.0,
+        'por_grupo' => [],
+    ];
+
+    if ($reporte === null) {
+        return $resumen;
+    }
+
+    $casoGrupo = obtenerCasoGrupoContribuyente();
     $sql = "SELECT
-                p.codigo_aduana,
-                a.nombre_de_la_aduana,
-                p.cod_de_forma,
-                COALESCE(NULLIF(TRIM(tf.formas), ''), CAST(p.cod_de_forma AS CHAR)) AS forma_codigo,
-                COALESCE(NULLIF(TRIM(tf.denominacion), ''), 'Sin denominación registrada') AS denominacion_forma,
+                {$casoGrupo} AS grupo_numero,
                 COUNT(*) AS total,
                 COALESCE(SUM(p.monto2), 0) AS monto
             FROM planillas_emitidas p
-            LEFT JOIN aduanas a ON a.codigo_aduana = p.codigo_aduana
-            LEFT JOIN tformas tf ON tf.codigo_de_forma = p.cod_de_forma
-            WHERE p.fecha_cancelacion BETWEEN ? AND ?
-              AND p.fecha_cancelacion > '0000-00-00'
+            LEFT JOIN consignatarios c
+                ON c.rif_consignatario = p.rif_consignatario
+            WHERE {$reporte['condicion']}
               AND COALESCE(p.anulada, 0) <> 1
-            GROUP BY
-                p.codigo_aduana,
-                a.nombre_de_la_aduana,
-                p.cod_de_forma,
-                tf.formas,
-                tf.denominacion
-              ORDER BY
-                  CASE p.codigo_aduana
-                      WHEN '5005' THEN 1
-                      WHEN '5105' THEN 2
-                      WHEN '5505' THEN 3
-                      WHEN '5705' THEN 4
-                      WHEN '5805' THEN 5
-                      WHEN '5905' THEN 6
-                      ELSE 99
-                  END,
-                  p.codigo_aduana,
-                  CAST(COALESCE(NULLIF(TRIM(tf.formas), ''), p.cod_de_forma) AS UNSIGNED),
-                  denominacion_forma";
+            GROUP BY grupo_numero
+            ORDER BY grupo_numero";
 
     $stmt = $conn->prepare($sql);
     enlazarParametrosReporte($stmt, $fechaDesde, $fechaHasta);
     $stmt->execute();
 
     $resultado = $stmt->get_result();
-    $resumen = [
-        'total' => 0,
-        'monto' => 0.0,
-        'por_aduana' => [],
+    $nombresGrupo = [
+        1 => 'Sector Público',
+        2 => 'Sector Privado',
+        3 => 'Natural',
+        4 => 'Otro',
     ];
-    $indicesAduana = [];
 
     while ($fila = $resultado->fetch_assoc()) {
-        $fila['total'] = (int) $fila['total'];
-        $fila['monto'] = (float) $fila['monto'];
-        $fila['nombre_de_la_aduana'] = $fila['nombre_de_la_aduana']
-            ?? $fila['codigo_aduana'];
-        $fila['forma_codigo'] = trim((string) $fila['forma_codigo']);
-        $fila['denominacion_forma'] = trim((string) $fila['denominacion_forma']);
+        $grupoNumero = (int) $fila['grupo_numero'];
+        $total = (int) $fila['total'];
+        $monto = (float) $fila['monto'];
 
-        $codigoAduana = (string) $fila['codigo_aduana'];
-
-        if (!isset($indicesAduana[$codigoAduana])) {
-            $indicesAduana[$codigoAduana] = count($resumen['por_aduana']);
-            $resumen['por_aduana'][] = [
-                'codigo_aduana' => $codigoAduana,
-                'nombre_de_la_aduana' => $fila['nombre_de_la_aduana'],
-                'total' => 0,
-                'monto' => 0.0,
-                'por_forma' => [],
-            ];
-        }
-
-        $indiceAduana = $indicesAduana[$codigoAduana];
-        $resumen['por_aduana'][$indiceAduana]['total'] += $fila['total'];
-        $resumen['por_aduana'][$indiceAduana]['monto'] += $fila['monto'];
-        $resumen['por_aduana'][$indiceAduana]['por_forma'][] = $fila;
-
-        $resumen['total'] += $fila['total'];
-        $resumen['monto'] += $fila['monto'];
+        $resumen['por_grupo'][] = [
+            'grupo' => $nombresGrupo[$grupoNumero] ?? 'Otro',
+            'total' => $total,
+            'monto' => $monto,
+        ];
+        $resumen['total'] += $total;
+        $resumen['monto'] += $monto;
     }
 
     $resultado->free();
@@ -213,61 +295,45 @@ function obtenerResumenReporte(
  * Obtiene el detalle completo de planillas para exportar a PDF o Excel.
  *
  * @param mysqli $conn Conexión activa.
+ * @param string $tipo Tipo de reporte.
  * @param string $fechaDesde Fecha inicial.
  * @param string $fechaHasta Fecha final.
- * @return mysqli_result Resultado ordenado por aduana y tipo de planilla.
+ * @return mysqli_result Resultado ordenado por grupo de contribuyente.
  */
 function obtenerDetalleReporte(
     mysqli $conn,
+    string $tipo,
     string $fechaDesde,
     string $fechaHasta
 ): mysqli_result {
+    $reporte = obtenerTipoReporte($tipo);
+
+    if ($reporte === null) {
+        throw new InvalidArgumentException('Tipo de reporte no válido.');
+    }
+
+    $casoGrupo = obtenerCasoGrupoContribuyente();
     $sql = "SELECT
-                p.codigo_aduana,
-                a.nombre_de_la_aduana,
-                p.cod_de_forma,
-                COALESCE(NULLIF(TRIM(tf.formas), ''), CAST(p.cod_de_forma AS CHAR)) AS forma_codigo,
-                COALESCE(NULLIF(TRIM(tf.denominacion), ''), 'Sin denominación registrada') AS denominacion_forma,
-                p.tipo_de_planilla,
                 p.nro_declaracion,
                 p.nro_formulario,
                 p.fecha_contabilidad_liq,
-                p.nro_liquidacion,
-                p.rif_consignatario,
+                c.rif_consignatario,
                 c.nombre_consignatario,
-                p.monto2,
-                p.fecha_vencimiento,
                 p.fecha_cancelacion,
-                CASE
-                    WHEN p.fecha_vencimiento > '0000-00-00'
-                        THEN GREATEST(DATEDIFF(p.fecha_cancelacion, p.fecha_vencimiento), 0)
-                    ELSE NULL
-                END AS dias_mora
+                p.monto2,
+                p.cod_de_forma,
+                p.tipo_de_planilla,
+                p.codigo_aduana,
+                p.fecha_vencimiento,
+                p.cod_status
             FROM planillas_emitidas p
             LEFT JOIN consignatarios c
                 ON c.rif_consignatario = p.rif_consignatario
-            LEFT JOIN aduanas a
-                ON a.codigo_aduana = p.codigo_aduana
-            LEFT JOIN tformas tf
-                ON tf.codigo_de_forma = p.cod_de_forma
-            WHERE p.fecha_cancelacion BETWEEN ? AND ?
-              AND p.fecha_cancelacion > '0000-00-00'
+            WHERE {$reporte['condicion']}
               AND COALESCE(p.anulada, 0) <> 1
             ORDER BY
-                  CASE p.codigo_aduana
-                      WHEN '5005' THEN 1
-                      WHEN '5105' THEN 2
-                      WHEN '5505' THEN 3
-                      WHEN '5705' THEN 4
-                      WHEN '5805' THEN 5
-                      WHEN '5905' THEN 6
-                      ELSE 99
-                  END,
-                  p.codigo_aduana,
-                  CAST(COALESCE(NULLIF(TRIM(tf.formas), ''), p.cod_de_forma) AS UNSIGNED),
-                  denominacion_forma,
-                  p.tipo_de_planilla,
-                  p.nro_formulario";
+                {$casoGrupo},
+                {$reporte['orden']}";
 
     $stmt = $conn->prepare($sql);
     enlazarParametrosReporte($stmt, $fechaDesde, $fechaHasta);
