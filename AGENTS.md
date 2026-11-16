@@ -10,8 +10,9 @@
   2. `require_once __DIR__ . '/src/bootstrap.php'`.
   3. `require_once __DIR__ . '/src/auth.php'` o `src/password_reset.php`.
   4. `require` de una vista parcial en `views/`.
-- `views/` contiene HTML/PHP parcial, no un template engine.
-- CSS separado: `assets/css/base.css` compartido; `login.css`, `recovery.css`, `layout.css` y `dashboard.css` por zona.
+- `src/` contiene la lógica PHP en archivos planos, sin subcarpetas por módulo.
+- `views/<área>/` contiene parciales HTML/PHP; no hay template engine.
+- CSS por módulo en `assets/css/`; `base.css` concentra estilos y variables compartidas.
 
 ## Comandos
 
@@ -27,15 +28,15 @@ php -S 127.0.0.1:8080 -t .
 # Lint PHP completo
 find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
 
-# Lint del único JS del proyecto
-node --check assets/js/login.js
+# Lint de JavaScript
+find assets/js -name '*.js' -print0 | xargs -0 -n1 node --check
 
 # Comprobación de whitespace/conflictos en el diff
 git diff --check
 ```
 
 - No hay tests automatizados. La verificación funcional es manual en el navegador; el diseño actual es de escritorio y se revisa a **1440px**.
-- Rama de trabajo actual: `login`. Mensajes de commit en español.
+- Rama de trabajo: confirmar con `git branch --show-current`. Mensajes de commit en español.
 
 ## Base de datos y sesión
 
@@ -62,6 +63,15 @@ Tabla principal: `planillas_emitidas`.
 - Textos de UI y comentarios en español.
 
 Para portar reportes o lógica de planillas, consultar el sistema anterior en el directorio hermano `SISTEMA INTERNO RECAUDACION` cuando exista; ahí están las consultas PDF/Excel y el comportamiento esperado.
+
+## Reportes
+
+- `reportes.php` es el endpoint de consulta; `reporte_exportar.php` es el endpoint de descarga PDF/Excel.
+- La definición de tipos, condiciones y helpers comunes vive en `src/reportes.php`; no dupliques esas condiciones en otros archivos ni en esta guía.
+- El reporte diario restaurado vive en `src/reportes_diario.php`, `src/reporte_pdf_diario.php` y `src/exportar_reporte_diario.php`.
+- Las vistas del módulo están en `views/reportes/`.
+- La estructura de columnas, agrupación, subtotales y diseño de PDF/Excel puede cambiar. No asumir la estructura actual como contrato; revisar la implementación vigente y el sistema anterior.
+- No fijar en esta guía conteos, fechas de prueba ni la estructura de salida de los reportes.
 
 ## Interfaz
 

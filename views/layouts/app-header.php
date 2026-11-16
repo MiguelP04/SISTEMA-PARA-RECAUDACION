@@ -150,7 +150,7 @@ $registroActivo = $registroActivo ?? '';
                         >
                             <span>
                                 <strong>Planillas</strong>
-                                <small>Alta manual de planilla</small>
+                                <small>Registro manual de planilla</small>
                             </span>
                         </a>
 
@@ -160,7 +160,7 @@ $registroActivo = $registroActivo ?? '';
                         >
                             <span>
                                 <strong>Consignatarios</strong>
-                                <small>Alta de consignatario</small>
+                                <small>Registro de consignatario</small>
                             </span>
                         </a>
 
@@ -170,7 +170,7 @@ $registroActivo = $registroActivo ?? '';
                         >
                             <span>
                                 <strong>Agentes aduanales</strong>
-                                <small>Alta de agente aduanal</small>
+                                <small>Registro de agente aduanal</small>
                             </span>
                         </a>
                     </div>
