@@ -15,20 +15,27 @@ $iconosCatalogo = [
 $gruposCatalogo = [
     [
         'titulo' => 'Planillas',
-        'tipos' => ['liquidado', 'pagado', 'diario'],
+        'tipos' => ['liquidado', 'pagado'],
+    ],
+    [
+        'titulo' => 'Planillas pagadas por período',
+        'tipos' => ['diario', 'semanal', 'mensual', 'anual'],
+        'clase_grid' => 'report-catalog__grid--periodos',
     ],
     [
         'titulo' => 'Derechos pendientes',
         'tipos' => ['derechos_pendientes', 'derechos_pendientes_pagados'],
     ],
 ];
+
+$totalReportes = count($tiposReporte);
 ?>
 <section class="report-catalog" aria-labelledby="report-catalog-title">
     <div class="report-catalog__header">
         <div>
             <h2 id="report-catalog-title" class="report-catalog__title">Tipos de reportes</h2>
             <p class="report-catalog__text">
-                Cinco reportes disponibles para generar en PDF o Excel.
+                <?= number_format($totalReportes, 0, ',', '.') ?> reportes disponibles para generar en PDF o Excel.
             </p>
         </div>
     </div>
@@ -39,7 +46,7 @@ $gruposCatalogo = [
                 <?= htmlspecialchars($grupo['titulo'], ENT_QUOTES, 'UTF-8') ?>
             </h3>
 
-            <div class="report-catalog__grid">
+            <div class="report-catalog__grid<?= !empty($grupo['clase_grid']) ? ' ' . htmlspecialchars($grupo['clase_grid'], ENT_QUOTES, 'UTF-8') : '' ?>">
                 <?php foreach ($grupo['tipos'] as $tipoReporte): ?>
                     <?php
                     $reporteCatalogo = $tiposReporte[$tipoReporte] ?? null;

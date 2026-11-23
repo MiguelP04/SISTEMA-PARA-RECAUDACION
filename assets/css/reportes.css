@@ -114,6 +114,10 @@
     margin-top: 10px;
 }
 
+.report-catalog__grid--periodos {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .report-card {
     display: flex;
     align-items: flex-start;
@@ -139,9 +143,32 @@
 }
 
 .report-card.is-selected {
-    background: #fff9dc;
-    border-color: var(--color-primary);
-    box-shadow: inset 3px 0 0 var(--color-primary), 0 8px 20px rgba(26, 31, 83, 0.12);
+    background: var(--color-secondary);
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 10px 24px rgba(26, 31, 83, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+.report-card.is-selected:hover {
+    background: #ffd13a;
+}
+
+.report-card.is-selected .report-card__icon {
+    color: var(--color-primary);
+    background: #fff8dd;
+    border-color: rgba(26, 31, 83, 0.28);
+}
+
+.report-card.is-selected .report-card__title {
+    color: var(--color-primary);
+}
+
+.report-card.is-selected .report-card__description {
+    color: #2b315f;
+}
+
+.report-card.is-selected .report-card__badge {
+    color: #ffffff;
+    background: var(--color-primary);
 }
 
 .report-card:focus-visible {
@@ -272,6 +299,22 @@
     grid-template-columns: repeat(2, minmax(0, 1fr)) 190px;
     gap: 16px;
     align-items: end;
+}
+
+.report-filters__grid--liquidado {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.report-filters__grid--liquidado .report-filters__actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.report-filters__grid--liquidado .report-button {
+    width: auto;
+    min-width: 190px;
 }
 
 .report-field__label {

@@ -54,7 +54,7 @@ Tabla principal: `planillas_emitidas`.
 
 - Pagada: `fecha_cancelacion > '0000-00-00'`.
 - Pendiente: `fecha_cancelacion IS NULL` o `fecha_cancelacion = '0000-00-00'`.
-- Excluir anuladas en métricas operativas: `anulada <> 1`.
+- Los reportes de planillas incluyen anuladas para replicar el sistema anterior. Dashboard y consultas sí excluyen `anulada = 1` en sus métricas operativas.
 - Monto: `monto2`.
 - Formato monetario en español: `number_format($valor, 2, ',', '.')`.
 - Fechas visibles: `d/m/Y`.
@@ -68,9 +68,12 @@ Para portar reportes o lógica de planillas, consultar el sistema anterior en el
 
 - `reportes.php` es el endpoint de consulta; `reporte_exportar.php` es el endpoint de descarga PDF/Excel.
 - La definición de tipos, condiciones y helpers comunes vive en `src/reportes.php`; no dupliques esas condiciones en otros archivos ni en esta guía.
-- El reporte diario restaurado vive en `src/reportes_diario.php`, `src/reporte_pdf_diario.php` y `src/exportar_reporte_diario.php`.
+- Todos los reportes exportan Excel mediante `src/exportar_reporte_planillas_excel.php`: una tabla plana de 30 columnas con datos de aduana, consignatario, agente, resolución, notificación, banco, agencia, `Monto 2`, los 14 ramos y una columna `TOTAL` que suma los ramos de cada fila.
+- Los reportes pagado, diario, semanal, mensual y anual comparten `src/reportes_diario.php`, `src/reporte_pdf_diario.php` y `src/exportar_reporte_diario.php`; solo cambia el rango predeterminado de fechas. El PDF conserva 12 columnas y agrupa por aduana y forma. Planillas Pagadas no tiene filtros de aduana ni forma: muestra todas las aduanas con sus formas.
+- Planillas Liquidadas usa `src/reportes_liquidado.php` para agrupar por aduana y forma, con filtros opcionales de aduana y forma (`80`, `81`, `86`). Su PDF mantiene 12 columnas.
 - Las vistas del módulo están en `views/reportes/`.
 - La estructura de columnas, agrupación, subtotales y diseño de PDF/Excel puede cambiar. No asumir la estructura actual como contrato; revisar la implementación vigente y el sistema anterior.
+- El reporte Derechos Pendientes conserva la condición del PDF anterior; por precedencia de `OR` puede incluir registros históricos. No “corregirla” sin autorización.
 - No fijar en esta guía conteos, fechas de prueba ni la estructura de salida de los reportes.
 
 ## Interfaz

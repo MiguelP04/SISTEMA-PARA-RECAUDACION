@@ -1,11 +1,70 @@
 <?php
 /**
- * Lógica de datos del reporte diario de planillas pagadas.
+ * Lógica de datos de los reportes de planillas pagadas por período.
  *
  * Restaura el comportamiento del reporte anterior: detalle por aduana y
  * forma, resumen por aduana/forma y total general. Reutiliza los helpers
  * de formato y la conexión de src/reportes.php.
  */
+
+/**
+ * Devuelve los ramos de ingreso solicitados para el reporte.
+ *
+ * @return array<int, array<string, string>> Catálogo fijo de ramos.
+ */
+function obtenerRamosPlanillasPagadas(): array
+{
+    static $ramos = null;
+
+    if ($ramos === null) {
+        $ramos = [
+            ['codigo' => '31', 'clave' => 'ramo_31', 'etiqueta' => 'Derechos de almacenaje'],
+            ['codigo' => '13', 'clave' => 'ramo_13', 'etiqueta' => 'Habilitaciones'],
+            ['codigo' => '10', 'clave' => 'ramo_10', 'etiqueta' => 'IVA'],
+            ['codigo' => '01', 'clave' => 'ramo_01', 'etiqueta' => 'Impuesto de importación'],
+            ['codigo' => '22', 'clave' => 'ramo_22', 'etiqueta' => 'Intereses de mora'],
+            ['codigo' => '23', 'clave' => 'ramo_23', 'etiqueta' => 'Multas'],
+            ['codigo' => '12', 'clave' => 'ramo_12', 'etiqueta' => 'Servicios de aduana'],
+            ['codigo' => '04', 'clave' => 'ramo_04', 'etiqueta' => 'Impuesto de bultos postales'],
+            ['codigo' => '30', 'clave' => 'ramo_30', 'etiqueta' => 'Bandas de garantía'],
+            ['codigo' => '28', 'clave' => 'ramo_28', 'etiqueta' => 'Timbres fiscales'],
+            ['codigo' => '56', 'clave' => 'ramo_56', 'etiqueta' => 'Impuesto sobre cigarrillos'],
+            ['codigo' => '32', 'clave' => 'ramo_32', 'etiqueta' => 'Impuesto PVP alcoholes'],
+            ['codigo' => '33', 'clave' => 'ramo_33', 'etiqueta' => 'Impuesto interno sobre alcoholes'],
+            ['codigo' => '34', 'clave' => 'ramo_34', 'etiqueta' => 'Expedición al público de alcoholes'],
+        ];
+    }
+
+    return $ramos;
+}
+
+/**
+ * Devuelve las columnas SQL que resumen los ramos por formulario.
+ *
+ * @return string Expresiones SUM(CASE...) para el SELECT.
+ */
+function obtenerColumnasSqlRamosPlanillasPagadas(): string
+{
+    $columnas = [];
+
+    foreach (obtenerRamosPlanillasPagadas() as $ramo) {
+        $columnas[] = "COALESCE(SUM(CASE WHEN cod_concepto = '{$ramo['codigo']}' THEN monto ELSE 0 END), 0) AS {$ramo['clave']}";
+    }
+
+    return implode(",\n                ", $columnas);
+}
+
+/**
+ * Devuelve los códigos de ramos usados en el filtro SQL.
+ *
+ * @return string Lista de códigos entre comillas simples.
+ */
+function obtenerCodigosSqlRamosPlanillasPagadas(): string
+{
+    $codigos = array_column(obtenerRamosPlanillasPagadas(), 'codigo');
+
+    return "'" . implode("', '", $codigos) . "'";
+}
 
 /**
  * Convierte una fila de la consulta en valores listos para mostrar o exportar.
@@ -17,13 +76,10 @@ function formatearFilaReporteDiario(array $fila): array
 {
     $rif = trim((string) ($fila['rif_consignatario'] ?? ''));
     $nombre = trim((string) ($fila['nombre_consignatario'] ?? ''));
+    $ramos = [];
 
-    if ($rif !== '' && $nombre !== '') {
-        $contribuyente = $rif . ' - ' . $nombre;
-    } elseif ($nombre !== '') {
-        $contribuyente = $nombre;
-    } else {
-        $contribuyente = $rif;
+    foreach (obtenerRamosPlanillasPagadas() as $ramo) {
+        $ramos[$ramo['clave']] = (float) ($fila[$ramo['clave']] ?? 0);
     }
 
     return [
@@ -36,18 +92,21 @@ function formatearFilaReporteDiario(array $fila): array
         'nro_declaracion' => (string) ($fila['nro_declaracion'] ?? ''),
         'nro_formulario' => (string) ($fila['nro_formulario'] ?? ''),
         'fecha_liquidacion' => formatearFechaReporte($fila['fecha_contabilidad_liq'] ?? null),
-        'nro_liquidacion' => (string) ($fila['nro_liquidacion'] ?? ''),
-        'contribuyente' => $contribuyente,
+        'rif_consignatario' => $rif,
+        'nombre_consignatario' => $nombre,
+        'fecha_pago' => formatearFechaReporte($fila['fecha_cancelacion'] ?? null),
         'monto' => formatearMontoReporte($fila['monto2'] ?? 0),
         'monto_numero' => (float) ($fila['monto2'] ?? 0),
+        'tipo_forma' => (string) ($fila['cod_de_forma'] ?? ''),
+        'concepto' => (string) ($fila['tipo_de_planilla'] ?? ''),
         'fecha_vencimiento' => formatearFechaReporte($fila['fecha_vencimiento'] ?? null),
-        'fecha_cancelacion' => formatearFechaReporte($fila['fecha_cancelacion'] ?? null),
-        'dias_mora' => $fila['dias_mora'] === null ? 'N/A' : (string) (int) $fila['dias_mora'],
+        'estatus' => (string) ($fila['cod_status'] ?? ''),
+        'ramos' => $ramos,
     ];
 }
 
 /**
- * Obtiene el resumen de planillas agrupado por aduana y denominación.
+ * Obtiene el resumen de planillas agrupado por aduana y forma.
  *
  * @param mysqli $conn Conexión activa.
  * @param string $fechaDesde Fecha inicial.
@@ -72,7 +131,6 @@ function obtenerResumenReporteDiario(
             LEFT JOIN tformas tf ON tf.codigo_de_forma = p.cod_de_forma
             WHERE p.fecha_cancelacion BETWEEN ? AND ?
               AND p.fecha_cancelacion > '0000-00-00'
-              AND COALESCE(p.anulada, 0) <> 1
             GROUP BY
                 p.codigo_aduana,
                 a.nombre_de_la_aduana,
@@ -154,6 +212,16 @@ function obtenerDetalleReporteDiario(
     string $fechaDesde,
     string $fechaHasta
 ): mysqli_result {
+    $columnasRamos = obtenerColumnasSqlRamosPlanillasPagadas();
+    $codigosRamos = obtenerCodigosSqlRamosPlanillasPagadas();
+    $seleccionRamos = [];
+
+    foreach (obtenerRamosPlanillasPagadas() as $ramo) {
+        $seleccionRamos[] = "COALESCE(r.{$ramo['clave']}, 0) AS {$ramo['clave']}";
+    }
+
+    $seleccionRamosSql = implode(",\n                ", $seleccionRamos);
+
     $sql = "SELECT
                 p.codigo_aduana,
                 a.nombre_de_la_aduana,
@@ -164,27 +232,38 @@ function obtenerDetalleReporteDiario(
                 p.nro_declaracion,
                 p.nro_formulario,
                 p.fecha_contabilidad_liq,
-                p.nro_liquidacion,
                 p.rif_consignatario,
                 c.nombre_consignatario,
-                p.monto2,
-                p.fecha_vencimiento,
+                p.rif_agente,
+                ag.nombre_agente,
+                p.nro_resolucion,
+                p.fecha_de_notificacion,
                 p.fecha_cancelacion,
-                CASE
-                    WHEN p.fecha_vencimiento > '0000-00-00'
-                        THEN GREATEST(DATEDIFF(p.fecha_cancelacion, p.fecha_vencimiento), 0)
-                    ELSE NULL
-                END AS dias_mora
+                p.cod_banco,
+                p.cod_agencia,
+                p.monto2,
+                p.cod_status,
+                p.fecha_vencimiento,
+                {$seleccionRamosSql}
             FROM planillas_emitidas p
             LEFT JOIN consignatarios c
                 ON c.rif_consignatario = p.rif_consignatario
+            LEFT JOIN agentes_aduanales ag
+                ON ag.rif_agentes = p.rif_agente
             LEFT JOIN aduanas a
                 ON a.codigo_aduana = p.codigo_aduana
             LEFT JOIN tformas tf
                 ON tf.codigo_de_forma = p.cod_de_forma
+            LEFT JOIN (
+                SELECT
+                    nro_formulario,
+                    {$columnasRamos}
+                FROM impuestos_a_pagar
+                WHERE cod_concepto IN ({$codigosRamos})
+                GROUP BY nro_formulario
+            ) r ON r.nro_formulario = p.nro_formulario
             WHERE p.fecha_cancelacion BETWEEN ? AND ?
               AND p.fecha_cancelacion > '0000-00-00'
-              AND COALESCE(p.anulada, 0) <> 1
             ORDER BY
                   CASE p.codigo_aduana
                       WHEN '5005' THEN 1

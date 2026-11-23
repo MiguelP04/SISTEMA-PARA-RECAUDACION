@@ -5,7 +5,7 @@
  * No muestra el detalle de las planillas: solo totales y accesos de descarga.
  *
  * Variables disponibles:
- * - $tipo, $resumen, $fechaDesde, $fechaHasta.
+ * - $reporte, $tipo, $resumen, $fechaDesde, $fechaHasta.
  */
 $fechaDesdeTexto = formatearFechaReporte($fechaDesde);
 $fechaHastaTexto = formatearFechaReporte($fechaHasta);
@@ -29,7 +29,7 @@ $urlExcel = 'reporte_exportar.php?' . http_build_query(
         <div>
             <p class="report-summary__eyebrow">Resultado de la consulta</p>
             <h2 id="report-summary-title" class="report-summary__title">
-                Reporte de Planillas por Fecha de Cancelación
+                Reporte de Planillas Pagadas
             </h2>
         </div>
 
@@ -56,7 +56,7 @@ $urlExcel = 'reporte_exportar.php?' . http_build_query(
     </div>
 
     <div class="report-summary__breakdown">
-        <h3 class="report-summary__breakdown-title">Totales por aduana y denominación</h3>
+        <h3 class="report-summary__breakdown-title">Totales por aduana y forma</h3>
 
         <?php if (!empty($resumen['por_aduana'])): ?>
             <div class="report-breakdown">

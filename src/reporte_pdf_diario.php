@@ -3,8 +3,9 @@
  * PDF del reporte diario de planillas pagadas.
  *
  * Mantiene la estructura anterior: detalle por aduana y forma, subtotales
- * y total general. Requiere libs/fpdf/fpdf.php y src/reporte_pdf.php
- * (para textoReportePdf) cargados antes de este archivo.
+ * y total general. Usa las mismas 12 columnas de Planillas Pagadas.
+ * Requiere libs/fpdf/fpdf.php y src/reporte_pdf.php (para textoReportePdf)
+ * cargados antes de este archivo.
  */
 
 class ReportePlanillasPDF extends FPDF
@@ -16,12 +17,13 @@ class ReportePlanillasPDF extends FPDF
 
     public string $fechaDesde = '';
     public string $fechaHasta = '';
+    public string $titulo = 'Reporte de Planillas Pagadas';
     public bool $tablaActiva = false;
     public string $tituloAduanaActiva = '';
     public string $tituloFormaActiva = '';
 
-    private array $widths = [30, 22, 20, 19, 60, 24, 16, 21, 21, 15];
-    private array $aligns = ['L', 'L', 'L', 'L', 'L', 'R', 'L', 'L', 'L', 'C'];
+    private array $widths = [25, 20, 18, 20, 45, 18, 18, 15, 20, 18, 18, 15];
+    private array $aligns = ['L', 'L', 'L', 'L', 'L', 'L', 'R', 'L', 'L', 'C', 'L', 'C'];
 
     public function Header(): void
     {
@@ -38,7 +40,7 @@ class ReportePlanillasPDF extends FPDF
         $this->Cell(
             0,
             8,
-            textoReportePdf('Reporte de Planillas por Fecha de Cancelación'),
+            textoReportePdf($this->titulo),
             0,
             1,
             'C'
@@ -131,15 +133,17 @@ class ReportePlanillasPDF extends FPDF
 
         $etiquetas = [
             "Nro.\nConfrontación",
-            'Formulario',
-            "Fecha\nLiquidación",
-            "Nro\nLiquidación",
-            'Contribuyente',
-            "Monto\nTotal",
-            "Tipo\nPlanilla",
-            "Fecha\nVencimiento",
-            "Fecha\nCancelación",
-            "Días\nMora",
+            "Nro.\nFormulario",
+            'Fecha Liq.',
+            "RIF\nConsignatario",
+            "Nombre\nConsignatario",
+            'Fecha Pago',
+            'Monto',
+            "Tipo\nForma",
+            'Concepto',
+            "Cód.\nAduana",
+            'Fecha Venc.',
+            'Estatus',
         ];
 
         $this->SetFont('Arial', 'B', 7);
@@ -376,7 +380,7 @@ class ReportePlanillasPDF extends FPDF
         $this->Cell(
             array_sum($this->widths) - 50,
             8,
-            textoReportePdf('TOTAL GENERAL'),
+            textoReportePdf('TOTAL GENERAL RECAUDADO'),
             1,
             0,
             'C',

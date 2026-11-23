@@ -11,6 +11,7 @@ require_once __DIR__ . '/src/bootstrap.php';
 require_once __DIR__ . '/src/auth.php';
 require_once __DIR__ . '/src/reportes.php';
 require_once __DIR__ . '/src/reportes_diario.php';
+require_once __DIR__ . '/src/reportes_liquidado.php';
 
 $esAjax = strtolower(trim((string) ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? ''))) === 'xmlhttprequest';
 
@@ -63,12 +64,29 @@ if ($reporte === null) {
     exit('Tipo de reporte no válido.');
 }
 
-$fechaDesdeParametro = $_GET['desde'] ?? date('Y-m-d');
-$fechaHastaParametro = $_GET['hasta'] ?? date('Y-m-d');
+$rangoPredeterminado = obtenerRangoPredeterminadoReporte($tipo);
+$fechaDesdeParametro = $_GET['desde'] ?? $rangoPredeterminado[0];
+$fechaHastaParametro = $_GET['hasta'] ?? $rangoPredeterminado[1];
 $fechaDesde = is_string($fechaDesdeParametro) ? trim($fechaDesdeParametro) : '';
 $fechaHasta = is_string($fechaHastaParametro) ? trim($fechaHastaParametro) : '';
 $consultado = isset($_GET['consultar']);
-$esReporteDiario = $tipo === 'diario';
+$esReportePeriodo = esReportePlanillasPagadasPeriodo($tipo);
+$esReporteLiquidado = $tipo === 'liquidado';
+$aduanaSeleccionada = '';
+$formaSeleccionada = '';
+$aduanasReporte = [];
+$formasReporte = [];
+
+if ($esReporteLiquidado) {
+    $aduanasReporte = obtenerAduanasReporte($conn);
+    $formasReporte = obtenerFormasReporte($conn);
+
+    $aduanaParametro = $_GET['aduana'] ?? '';
+    $formaParametro = $_GET['forma'] ?? '';
+    $aduanaSeleccionada = is_string($aduanaParametro) ? trim($aduanaParametro) : '';
+    $formaSeleccionada = is_string($formaParametro) ? trim($formaParametro) : '';
+}
+
 $errores = [];
 $resumen = null;
 
@@ -79,10 +97,28 @@ if ($consultado) {
         $errores[] = 'La fecha desde no puede ser posterior a la fecha hasta.';
     }
 
+    if ($esReporteLiquidado && $aduanaSeleccionada !== '' && !isset($aduanasReporte[$aduanaSeleccionada])) {
+        $errores[] = 'La aduana seleccionada no es válida.';
+    }
+
+    if ($esReporteLiquidado && $formaSeleccionada !== '' && !isset($formasReporte[$formaSeleccionada])) {
+        $errores[] = 'El tipo de forma seleccionado no es válido.';
+    }
+
     if (empty($errores)) {
-        $resumen = $esReporteDiario
-            ? obtenerResumenReporteDiario($conn, $fechaDesde, $fechaHasta)
-            : obtenerResumenReporte($conn, $tipo, $fechaDesde, $fechaHasta);
+        if ($esReportePeriodo) {
+            $resumen = obtenerResumenReporteDiario($conn, $fechaDesde, $fechaHasta);
+        } elseif ($esReporteLiquidado) {
+            $resumen = obtenerResumenReporteLiquidado(
+                $conn,
+                $fechaDesde,
+                $fechaHasta,
+                $aduanaSeleccionada,
+                $formaSeleccionada
+            );
+        } else {
+            $resumen = obtenerResumenReporte($conn, $tipo, $fechaDesde, $fechaHasta);
+        }
     }
 }
 
@@ -102,7 +138,7 @@ if ($esAjax) {
 
     <link rel="stylesheet" href="assets/css/base.css">
     <link rel="stylesheet" href="assets/css/layout.css?v=4">
-    <link rel="stylesheet" href="assets/css/reportes.css?v=3">
+    <link rel="stylesheet" href="assets/css/reportes.css?v=6">
 </head>
 <body>
     <?php require __DIR__ . '/views/layouts/app-header.php'; ?>

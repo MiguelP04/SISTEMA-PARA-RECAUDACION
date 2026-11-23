@@ -1,16 +1,18 @@
 <?php
 /**
- * Filtros del reporte diario de planillas pagadas.
+ * Filtros de los reportes de planillas pagadas por período.
  *
  * Variables disponibles:
- * - $tipo, $fechaDesde, $fechaHasta, $errores.
+ * - $reporte, $tipo, $fechaDesde, $fechaHasta, $errores.
  */
 ?>
 <section class="report-filters" aria-labelledby="report-filters-title">
     <div class="report-filters__heading">
-        <h2 id="report-filters-title" class="report-filters__title">Planillas pagadas</h2>
+        <h2 id="report-filters-title" class="report-filters__title">
+            <?= htmlspecialchars($reporte['titulo'], ENT_QUOTES, 'UTF-8') ?>
+        </h2>
         <p class="report-filters__text">
-            Consulta las planillas canceladas dentro del rango de fechas seleccionado.
+            <?= htmlspecialchars($reporte['descripcion'], ENT_QUOTES, 'UTF-8') ?>
         </p>
     </div>
 
@@ -27,7 +29,9 @@
 
         <div class="report-filters__grid">
             <div class="report-field">
-                <label class="report-field__label" for="reporte-desde">Fecha desde</label>
+                <label class="report-field__label" for="reporte-desde">
+                    <?= htmlspecialchars($reporte['etiqueta_desde'], ENT_QUOTES, 'UTF-8') ?>
+                </label>
                 <div class="report-field__date">
                     <input
                         class="report-field__input"
@@ -45,7 +49,9 @@
             </div>
 
             <div class="report-field">
-                <label class="report-field__label" for="reporte-hasta">Fecha hasta</label>
+                <label class="report-field__label" for="reporte-hasta">
+                    <?= htmlspecialchars($reporte['etiqueta_hasta'], ENT_QUOTES, 'UTF-8') ?>
+                </label>
                 <div class="report-field__date">
                     <input
                         class="report-field__input"

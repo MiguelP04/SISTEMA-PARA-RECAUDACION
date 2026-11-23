@@ -3,7 +3,8 @@
  * Consultas y utilidades para el módulo de reportes.
  *
  * Los reportes trabajan sobre planillas_emitidas, usan monto2 como monto
- * principal y excluyen las planillas anuladas.
+ * principal e incluyen las planillas anuladas para replicar el sistema
+ * anterior.
  */
 
 /**
@@ -37,21 +38,54 @@ function obtenerTiposReporte(): array
             'archivo' => 'reporte_planillas_pagadas',
         ],
         'diario' => [
-            'titulo' => 'Planillas pagadas (diario)',
-            'descripcion' => 'Reporte diario de planillas canceladas con detalle por aduana y forma.',
+            'titulo' => 'Reporte diario',
+            'descripcion' => 'Planillas pagadas del día de hoy, con detalle por aduana y forma.',
             'icono' => 'check',
             'condicion' => "p.fecha_cancelacion BETWEEN ? AND ? AND p.fecha_cancelacion > '0000-00-00'",
             'orden' => 'p.nro_formulario',
             'etiqueta_desde' => 'Fecha desde',
             'etiqueta_hasta' => 'Fecha hasta',
             'total' => 'TOTAL GENERAL',
-            'archivo' => 'reporte_planillas_cancelacion',
+            'archivo' => 'reporte_planillas_pagadas_diario',
+        ],
+        'semanal' => [
+            'titulo' => 'Reporte semanal',
+            'descripcion' => 'Planillas pagadas de la semana actual, de lunes a domingo.',
+            'icono' => 'check',
+            'condicion' => "p.fecha_cancelacion BETWEEN ? AND ? AND p.fecha_cancelacion > '0000-00-00'",
+            'orden' => 'p.nro_formulario',
+            'etiqueta_desde' => 'Fecha desde',
+            'etiqueta_hasta' => 'Fecha hasta',
+            'total' => 'TOTAL GENERAL',
+            'archivo' => 'reporte_planillas_pagadas_semanal',
+        ],
+        'mensual' => [
+            'titulo' => 'Reporte mensual',
+            'descripcion' => 'Planillas pagadas del mes actual, desde el primer hasta el último día.',
+            'icono' => 'check',
+            'condicion' => "p.fecha_cancelacion BETWEEN ? AND ? AND p.fecha_cancelacion > '0000-00-00'",
+            'orden' => 'p.nro_formulario',
+            'etiqueta_desde' => 'Fecha desde',
+            'etiqueta_hasta' => 'Fecha hasta',
+            'total' => 'TOTAL GENERAL',
+            'archivo' => 'reporte_planillas_pagadas_mensual',
+        ],
+        'anual' => [
+            'titulo' => 'Reporte anual',
+            'descripcion' => 'Planillas pagadas del año actual, desde el 1 de enero hasta el 31 de diciembre.',
+            'icono' => 'check',
+            'condicion' => "p.fecha_cancelacion BETWEEN ? AND ? AND p.fecha_cancelacion > '0000-00-00'",
+            'orden' => 'p.nro_formulario',
+            'etiqueta_desde' => 'Fecha desde',
+            'etiqueta_hasta' => 'Fecha hasta',
+            'total' => 'TOTAL GENERAL',
+            'archivo' => 'reporte_planillas_pagadas_anual',
         ],
         'derechos_pendientes' => [
             'titulo' => 'Derechos Pendientes',
             'descripcion' => 'Derechos vencidos registrados en el período de contabilidad seleccionado.',
             'icono' => 'alerta',
-            'condicion' => 'p.fecha_vencimiento < CURDATE() AND p.fecha_contabilidad_liq BETWEEN ? AND ?',
+            'condicion' => "p.fecha_vencimiento < CURDATE() AND (p.fecha_cancelacion = '0000-00-00' OR p.fecha_cancelacion IS NULL OR p.fecha_cancelacion > p.fecha_vencimiento) OR p.anulada = '0' AND p.fecha_contabilidad_liq BETWEEN ? AND ?",
             'orden' => 'p.fecha_vencimiento, p.nro_formulario',
             'etiqueta_desde' => 'Período de contabilidad desde',
             'etiqueta_hasta' => 'Período de contabilidad hasta',
@@ -83,6 +117,53 @@ function obtenerTipoReporte(string $tipo): ?array
     $tipos = obtenerTiposReporte();
 
     return $tipos[$tipo] ?? null;
+}
+
+/**
+ * Indica si el tipo corresponde a un reporte de planillas pagadas por período.
+ *
+ * @param string $tipo Identificador del reporte.
+ * @return bool True para pagado, diario, semanal, mensual o anual.
+ */
+function esReportePlanillasPagadasPeriodo(string $tipo): bool
+{
+    return in_array($tipo, ['pagado', 'diario', 'semanal', 'mensual', 'anual'], true);
+}
+
+/**
+ * Devuelve el rango de fechas predeterminado para un reporte por período.
+ *
+ * @param string $tipo Identificador del reporte.
+ * @return array{0: string, 1: string} Fechas desde y hasta en formato Y-m-d.
+ */
+function obtenerRangoPredeterminadoReporte(string $tipo): array
+{
+    $hoy = new DateTimeImmutable('today');
+
+    switch ($tipo) {
+        case 'semanal':
+            $desde = $hoy->modify('monday this week');
+            $hasta = $hoy->modify('sunday this week');
+            break;
+
+        case 'mensual':
+            $desde = $hoy->modify('first day of this month');
+            $hasta = $hoy->modify('last day of this month');
+            break;
+
+        case 'anual':
+            $desde = $hoy->setDate((int) $hoy->format('Y'), 1, 1);
+            $hasta = $hoy->setDate((int) $hoy->format('Y'), 12, 31);
+            break;
+
+        case 'diario':
+        default:
+            $desde = $hoy;
+            $hasta = $hoy;
+            break;
+    }
+
+    return [$desde->format('Y-m-d'), $hasta->format('Y-m-d')];
 }
 
 /**
@@ -255,7 +336,6 @@ function obtenerResumenReporte(
             LEFT JOIN consignatarios c
                 ON c.rif_consignatario = p.rif_consignatario
             WHERE {$reporte['condicion']}
-              AND COALESCE(p.anulada, 0) <> 1
             GROUP BY grupo_numero
             ORDER BY grupo_numero";
 
@@ -312,6 +392,19 @@ function obtenerDetalleReporte(
         throw new InvalidArgumentException('Tipo de reporte no válido.');
     }
 
+    if (!function_exists('obtenerRamosPlanillasPagadas')) {
+        require_once __DIR__ . '/reportes_diario.php';
+    }
+
+    $columnasRamos = obtenerColumnasSqlRamosPlanillasPagadas();
+    $codigosRamos = obtenerCodigosSqlRamosPlanillasPagadas();
+    $seleccionRamos = [];
+
+    foreach (obtenerRamosPlanillasPagadas() as $ramo) {
+        $seleccionRamos[] = "COALESCE(r.{$ramo['clave']}, 0) AS {$ramo['clave']}";
+    }
+
+    $seleccionRamosSql = implode(",\n                ", $seleccionRamos);
     $casoGrupo = obtenerCasoGrupoContribuyente();
     $sql = "SELECT
                 p.nro_declaracion,
@@ -319,18 +412,34 @@ function obtenerDetalleReporte(
                 p.fecha_contabilidad_liq,
                 c.rif_consignatario,
                 c.nombre_consignatario,
+                p.rif_agente,
+                ag.nombre_agente,
+                p.nro_resolucion,
+                p.fecha_de_notificacion,
                 p.fecha_cancelacion,
+                p.cod_banco,
+                p.cod_agencia,
                 p.monto2,
                 p.cod_de_forma,
                 p.tipo_de_planilla,
                 p.codigo_aduana,
                 p.fecha_vencimiento,
-                p.cod_status
+                p.cod_status,
+                {$seleccionRamosSql}
             FROM planillas_emitidas p
             LEFT JOIN consignatarios c
                 ON c.rif_consignatario = p.rif_consignatario
+            LEFT JOIN agentes_aduanales ag
+                ON ag.rif_agentes = p.rif_agente
+            LEFT JOIN (
+                SELECT
+                    nro_formulario,
+                    {$columnasRamos}
+                FROM impuestos_a_pagar
+                WHERE cod_concepto IN ({$codigosRamos})
+                GROUP BY nro_formulario
+            ) r ON r.nro_formulario = p.nro_formulario
             WHERE {$reporte['condicion']}
-              AND COALESCE(p.anulada, 0) <> 1
             ORDER BY
                 {$casoGrupo},
                 {$reporte['orden']}";
